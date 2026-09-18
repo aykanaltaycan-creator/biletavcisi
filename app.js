@@ -271,12 +271,66 @@
   $('country').value = String(VISA.findIndex(function (v) { return v[0] === 'Fransa'; }));
   $('travelDate').value = iso(addDays(today(), 120));
 
+  // Vize kategorileri: her ikisinde de aynı 4 kısa süreli tür + "kapsam dışı" seçeneği.
+  var VISA_CATS = [
+    ['tourism', 'Turizm'],
+    ['family', 'Aile / Arkadaş Ziyareti'],
+    ['business', 'İş (Toplantı / Fuar)'],
+    ['study', 'Kısa Dönem Öğrenci Değişimi'],
+    ['longterm', 'Uzun Dönem Çalışma / Öğrenci']
+  ];
+  VISA_CATS.forEach(function (c) { $('visaCategory').appendChild(opt(c[0], c[1])); });
+
+  // Ortak belgeler (her kategoride istenir)
+  var DOC_BASE = [
+    'Dönüş tarihinden sonra en az 3 ay geçerli, son 10 yılda alınmış pasaport (en az 2 boş sayfa)',
+    'Doldurulmuş ve imzalanmış vize başvuru formu',
+    'Son 6 ay içinde çekilmiş biyometrik fotoğraf',
+    'Gidiş-dönüş uçak bileti rezervasyonu',
+    'Seyahat boyunca geçerli, en az 30.000 € teminatlı seyahat sağlık sigortası',
+    'Son 3 aylık banka hesap dökümü (mali yeterlilik)'
+  ];
+  // Kategoriye özel ek belgeler
+  var DOC_EXTRA = {
+    tourism: ['Otel veya konaklama rezervasyonu', 'Günlük seyahat planı / güzergah'],
+    family: ['Davet eden kişiden davetiye mektubu', 'Davet edenin ikamet belgesi / pasaport örneği'],
+    business: ['İşvereninden görevlendirme yazısı', 'Ziyaret edilecek şirketten davet mektubu', 'Şirketin faaliyet belgesi (varsa)'],
+    study: ['Okuldan kabul veya kayıt yazısı', '18 yaş altıysa veli izin belgesi (noter onaylı)']
+  };
+  // Ücret bilgisi: Schengen ülkelerinde ortak, İngiltere'de ayrı.
+  var FEES = {
+    schengen: { amt: '90 €', sub: '12 yaş ve üzeri için. 6-11 yaş arası çocuklarda 45 €, 6 yaş altı ücretsizdir. Bu, AB\'nin resmi konsolosluk ücretidir; VFS/iDATA/BLS gibi merkezlerin ayrıca aldığı hizmet ücreti (genelde 20-30 €) bu tutara dahil değildir.' },
+    uk: { amt: '135 £', sub: '6 aya kadar geçerli Standard Visitor vizesi için (Nisan 2026 itibarıyla). 2/5/10 yıllık uzun süreli vizelerde ücret daha yüksektir.' }
+  };
+
   function renderVisa() {
     var v = VISA[+$('country').value], c = CENTERS[v[1]], uk = v[2] === 'uk';
     $('centerInfo').innerHTML = '<div class="center-name">' + c.n + '</div>' +
       '<span class="tag">' + (uk ? 'Schengen dışı' : 'Schengen') + '</span>' +
       '<p>' + v[0] + ' için Türkiye\'deki başvurular ' + c.n + ' üzerinden alınıyor.' + (uk ? ' Başvuru önce GOV.UK üzerinden başlatılır, biyometri randevusu merkezde verilir.' : '') + '</p>' +
       '<a class="btn" href="' + c.u + '" target="_blank" rel="noopener">' + c.n + ' sayfasını aç</a>';
+    renderVisaDocs(uk);
+    renderVisaDates(v, uk);
+  }
+
+  function renderVisaDocs(uk) {
+    var cat = $('visaCategory').value;
+    if (cat === 'longterm') {
+      $('visaDocs').innerHTML = '<div class="status wait">Uzun dönem çalışma veya öğrenci vizesi kısa süreli ziyaretçi vizesi kapsamına girmiyor. Bu, ayrı bir başvuru süreci; ücreti ve istenen belgeler ülkeye ve vize türüne göre değişiyor.' +
+        (uk ? ' İngiltere için <a href="https://www.gov.uk/skilled-worker-visa" target="_blank" rel="noopener">Skilled Worker</a> veya <a href="https://www.gov.uk/student-visa" target="_blank" rel="noopener">Student</a> vizesi sayfalarına bak.' : ' Ülkenin göçmenlik dairesinin veya konsolosluğunun resmi sayfasından "ulusal vize" (D vizesi) şartlarını kontrol et.') +
+        '</div>';
+      return;
+    }
+    var fee = uk ? FEES.uk : FEES.schengen;
+    var extra = DOC_EXTRA[cat] || [];
+    var h = '<div class="fee-box"><div class="fee-amt">' + fee.amt + '</div><div class="fee-sub">' + fee.sub + '</div></div>';
+    h += '<div class="doc-group">Gerekli belgeler</div><ul class="doclist">';
+    DOC_BASE.concat(extra).forEach(function (d) { h += '<li>' + esc(d) + '</li>'; });
+    h += '</ul><p class="note">Bu liste genel bir kılavuzdur; ülkeye ve başvuru merkezine göre ek belge istenebilir. Kesin listeyi başvurmadan önce merkezin resmi sayfasından teyit et.</p>';
+    $('visaDocs').innerHTML = h;
+  }
+
+  function renderVisaDates(v, uk) {
     var val = $('travelDate').value;
     if (!val) { $('visaDates').innerHTML = '<p class="note">Tarihleri görmek için uçuş tarihini gir.</p>'; return; }
     var fly = parse(val), t = today(), long = { day: 'numeric', month: 'long', year: 'numeric' };
@@ -293,7 +347,14 @@
     $('visaDates').innerHTML = h;
   }
   $('country').addEventListener('change', renderVisa);
-  $('travelDate').addEventListener('change', renderVisa);
+  $('visaCategory').addEventListener('change', function () {
+    var v = VISA[+$('country').value];
+    renderVisaDocs(v[2] === 'uk');
+  });
+  $('travelDate').addEventListener('change', function () {
+    var v = VISA[+$('country').value];
+    renderVisaDates(v, v[2] === 'uk');
+  });
 
   // ---------- başlangıç ----------
   search(false);
