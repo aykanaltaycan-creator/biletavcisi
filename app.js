@@ -84,4 +84,219 @@
   // ---------- form ----------
   TR.forEach(function (x) { $('from').appendChild(opt(x.c, x.n + (x.s ? ' (' + x.s + ')' : ''))); });
   function fillTo() {
-    var
+    var sel = $('to'), cur = sel.value || state.to, from = $('from').value;
+    sel.innerHTML = '';
+    sel.appendChild(opt('ANY', 'Her yer (en ucuzlar)'));
+    var g1 = document.createElement('optgroup'); g1.label = 'Yurt dışı';
+    INTL.slice().sort(function (a, b) { return a[1].localeCompare(b[1], 'tr'); }).forEach(function (x) { g1.appendChild(opt(x[0], x[1])); });
+    var g2 = document.createElement('optgroup'); g2.label = 'Yurt içi';
+    TR.forEach(function (x) { if (x.c !== from) g2.appendChild(opt(x.c, x.n)); });
+    sel.appendChild(g1); sel.appendChild(g2);
+    sel.value = cur === from ? 'ANY' : cur;
+    if (!sel.value) sel.value = 'ANY';
+  }
+  (function fillMonths() {
+    var t = today();
+    for (var i = 0; i < 12; i++) {
+      var d = new Date(t.getFullYear(), t.getMonth() + i, 1);
+      $('month').appendChild(opt(d.getFullYear() + '-' + pad(d.getMonth() + 1), MONTHS[d.getMonth()] + ' ' + d.getFullYear()));
+    }
+    $('month').selectedIndex = 1; state.ym = $('month').value;
+  })();
+  $('from').value = state.from; fillTo(); $('to').value = state.to;
+  $('from').addEventListener('change', fillTo);
+
+  document.querySelectorAll('.seg button').forEach(function (b) {
+    b.addEventListener('click', function () {
+      document.querySelectorAll('.seg button').forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); });
+      state.rt = b.dataset.trip === 'rt';
+      $('stayWrap').style.display = state.rt ? '' : 'none';
+    });
+  });
+
+  $('searchForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    state.from = $('from').value; state.to = $('to').value; state.ym = $('month').value;
+    state.stay = parseInt($('stay').value, 10); state.sel = null;
+    search(true);
+  });
+
+  // ---------- arama ----------
+  function tripLabel() { return state.rt ? 'gidiş-dönüş, ' + state.stay + ' gece' : 'tek yön'; }
+  function monthTitle() { var p = state.ym.split('-').map(Number); return MONTHS[p[1] - 1] + ' ' + p[0]; }
+
+  function search(scroll) {
+    var out = $('sonuc');
+    out.innerHTML = '<div class="state">Fiyatlar yükleniyor…</div>';
+    if (scroll) out.scrollIntoView({ block: 'start' });
+    var q = 'origin=' + state.from + '&month=' + state.ym + '&rt=' + (state.rt ? 1 : 0);
+    var req = state.to === 'ANY'
+      ? api('/api/anywhere?' + q).then(renderAnywhere)
+      : api('/api/calendar?' + q + '&destination=' + state.to + '&stay=' + state.stay).then(renderCalendar);
+    req.catch(function (err) {
+      out.innerHTML = '<div class="state err">' + esc(err.message) + '</div>';
+    });
+  }
+
+  function renderAnywhere(r) {
+    var t = iso(today());
+    var list = (r.list || []).filter(function (x) { return x.date >= t; });
+    var h = '<div class="result-head"><h2>' + esc(name(state.from)) + ' çıkışlı en ucuz yerler, ' + monthTitle() + '</h2><span class="best">' + (state.rt ? 'gidiş-dönüş' : 'tek yön') + '</span></div>';
+    if (!list.length) {
+      $('sonuc').innerHTML = h + '<div class="state">Bu ay için kayıtlı fiyat yok. Başka bir ay ya da kalkış şehri dene.</div>';
+      return;
+    }
+    h += '<ul class="board">';
+    list.forEach(function (x) {
+      var dep = parse(x.date), ret = x.ret ? parse(x.ret) : null;
+      h += '<li><a class="row" href="' + esc(x.link) + '" target="_blank" rel="noopener">' +
+        '<span class="route">' + esc(name(x.destination)) + '<small>' + esc(AIRLINES[x.airline] || x.airline || '') + ', ' + stopsText(x.transfers) + '</small></span>' +
+        '<span class="when">' + short(dep) + (ret ? ' – ' + short(ret) : '') + '</span>' +
+        '<span></span><span class="amt">' + tl(x.price) + '</span></a></li>';
+    });
+    h += '</ul><p class="src">Bir satıra tıklayınca bileti satan sitede o uçuş açılır.</p>';
+    $('sonuc').innerHTML = h;
+  }
+
+  function renderCalendar(r) {
+    state.days = r.days || [];
+    var byDate = {}; state.days.forEach(function (x) { byDate[x.date] = x; });
+    var p = state.ym.split('-').map(Number), first = new Date(p[0], p[1] - 1, 1), n = new Date(p[0], p[1], 0).getDate();
+    var t = today(), vals = [];
+    var cells = [];
+    for (var i = 1; i <= n; i++) {
+      var d = new Date(p[0], p[1] - 1, i), k = iso(d), past = d < t, x = past ? null : byDate[k];
+      cells.push({ d: d, k: k, x: x, past: past }); if (x) vals.push(x.price);
+    }
+    var head = '<div class="result-head"><h2>' + esc(name(state.from)) + ' – ' + esc(name(state.to)) + ', ' + monthTitle() + '</h2>';
+    if (!vals.length) {
+      $('sonuc').innerHTML = head + '</div><div class="state">Bu rota ve ay için son günlerde kayıtlı fiyat yok. Başka bir ay seç ya da "Her yer" ile ara. Bu veri gerçek kullanıcı aramalarından geldiği için az aranan rotalarda boşluk olabilir.</div>';
+      return;
+    }
+    var sorted = vals.slice().sort(function (a, b) { return a - b; });
+    var lo = sorted[Math.floor(sorted.length / 3)], hi = sorted[Math.floor(sorted.length * 2 / 3)], min = sorted[0];
+    var minCell = cells.filter(function (c) { return c.x && c.x.price === min; })[0];
+    if (!state.sel && minCell) state.sel = minCell.k;
+
+    var h = head + '<span class="best">En ucuz: ' + short(minCell.d) + ', ' + tl(min) + '</span></div>';
+    h += '<div class="cal-layout"><div class="cal"><div class="cal-grid">';
+    DOW.forEach(function (x) { h += '<div class="dow">' + x + '</div>'; });
+    var off = (first.getDay() + 6) % 7; for (var b = 0; b < off; b++) h += '<div class="blank"></div>';
+    cells.forEach(function (c) {
+      var dn = c.d.getDate();
+      if (!c.x) {
+        h += '<button class="day" type="button" disabled aria-label="' + fmt(c.d) + ', ' + (c.past ? 'geçmiş tarih' : 'fiyat yok') + '"><span class="n">' + dn + '</span><span class="p">' + (c.past ? '' : '–') + '</span></button>';
+        return;
+      }
+      var cls = c.x.price === min ? 'min' : c.x.price <= lo ? 'c1' : c.x.price >= hi ? 'c3' : 'c2';
+      h += '<button class="day ' + cls + (state.sel === c.k ? ' sel' : '') + '" type="button" data-date="' + c.k + '" aria-label="' + fmt(c.d) + ', ' + tl(c.x.price) + '"><span class="n">' + dn + '</span><span class="p">' + nf.format(c.x.price) + '</span></button>';
+    });
+    h += '</div><div class="legend"><span><i class="sw" style="background:var(--sign)"></i>En ucuz gün</span><span><i class="sw" style="background:var(--cheap-bg)"></i>Ucuz</span><span><i class="sw" style="background:var(--mid-bg);border:1px solid var(--line)"></i>Orta</span><span><i class="sw" style="background:var(--high-bg)"></i>Pahalı</span><span>Fiyatlar TL, kişi başı</span></div></div>';
+    h += '<div class="detail" id="detail">' + detailHTML() + '</div></div>';
+    $('sonuc').innerHTML = h;
+
+    document.querySelectorAll('#sonuc .day[data-date]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        document.querySelectorAll('#sonuc .day.sel').forEach(function (x) { x.classList.remove('sel'); });
+        btn.classList.add('sel'); state.sel = btn.dataset.date; $('detail').innerHTML = detailHTML();
+      });
+    });
+  }
+
+  function detailHTML() {
+    var x = state.days.filter(function (d) { return d.date === state.sel; })[0];
+    if (!x) return '<p>Takvimden bir gün seç.</p>';
+    var dep = parse(x.date), ret = x.ret ? parse(x.ret) : null;
+    var h = '<h3>' + esc(name(x.origin)) + ' – ' + esc(name(x.destination)) + '</h3><div class="when">' + tripLabel() + '</div>';
+    h += '<div class="price">' + tl(x.price) + '</div><div class="when">kişi başı</div>';
+    h += '<dl><dt>Gidiş</dt><dd>' + fmt(dep) + (time(x.depart) ? ', ' + time(x.depart) : '') + '</dd>';
+    if (ret) h += '<dt>Dönüş</dt><dd>' + fmt(ret) + (time(x.ret) ? ', ' + time(x.ret) : '') + '</dd>';
+    h += '<dt>Havayolu</dt><dd>' + airlineHTML(x.airline) + '</dd><dt>Aktarma (gidiş)</dt><dd>' + stopsText(x.transfers) + '</dd>';
+    if (ret && x.returnTransfers != null) h += '<dt>Aktarma (dönüş)</dt><dd>' + stopsText(x.returnTransfers) + '</dd>';
+    if (x.originAirport && x.destinationAirport) h += '<dt>Havalimanı</dt><dd>' + esc(x.originAirport) + ' – ' + esc(x.destinationAirport) + '</dd>';
+    h += '</dl><a class="btn" href="' + esc(x.link) + '" target="_blank" rel="noopener">Bileti satın alma sayfasında aç</a>';
+    h += '<p class="note">Bu fiyat son günlerde görülen en düşük fiyat. Satın alma sayfasında değişmiş olabilir.</p>';
+    return h;
+  }
+
+  // ---------- fırsatlar ----------
+  var DEAL_FROM = ['IST', 'ESB', 'IZM', 'AYT'], dealCache = {};
+  function loadDeals(o) {
+    var box = $('deals');
+    if (dealCache[o]) return renderDeals(dealCache[o]);
+    box.innerHTML = '<div class="state">Fırsatlar yükleniyor…</div>';
+    api('/api/deals?origin=' + o).then(function (r) { dealCache[o] = r; renderDeals(r); })
+      .catch(function (err) { box.innerHTML = '<div class="state err">' + esc(err.message) + '</div>'; });
+  }
+  function renderDeals(r) {
+    var t = iso(today());
+    var list = (r.list || []).filter(function (x) { return x.date >= t; }).slice(0, 12);
+    if (!list.length) { $('deals').innerHTML = '<div class="state">Bu şehirden şu an fırsat bilet görünmüyor. Başka bir kalkış şehri seç.</div>'; return; }
+    var h = '<ul class="board">';
+    list.forEach(function (x) {
+      var dep = parse(x.date), ret = x.ret ? parse(x.ret) : null;
+      h += '<li><a class="row" href="' + esc(x.link) + '" target="_blank" rel="noopener">' +
+        '<span class="route">' + esc(name(x.origin)) + ' – ' + esc(NAMES[x.destination] || x.destName || x.destination) +
+        '<small>' + esc(x.airlineTitle || AIRLINES[x.airline] || x.airline || '') + (ret ? ', gidiş-dönüş' : ', tek yön') + '</small></span>' +
+        '<span class="when">' + short(dep) + (ret ? ' – ' + short(ret) : '') + '</span>' +
+        '<span class="save">' + (x.discountPct != null && x.discountPct > 0 ? 'normalden %' + x.discountPct + ' ucuz' : 'fırsat') + '</span><span class="amt">' + tl(x.price) + '</span></a></li>';
+    });
+    $('deals').innerHTML = h + '</ul>';
+  }
+  (function chips() {
+    var c = $('dealChips');
+    DEAL_FROM.forEach(function (code, i) {
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'chip'; b.textContent = name(code);
+      b.setAttribute('aria-pressed', String(i === 0));
+      b.addEventListener('click', function () {
+        c.querySelectorAll('.chip').forEach(function (y) { y.setAttribute('aria-pressed', String(y === b)); });
+        loadDeals(code);
+      });
+      c.appendChild(b);
+    });
+  })();
+
+  // ---------- vize ----------
+  var CENTERS = {
+    vfs: { n: 'VFS Global', u: 'https://www.vfsglobal.com' },
+    idata: { n: 'iDATA', u: 'https://www.idata.com.tr' },
+    bls: { n: 'BLS International', u: 'https://www.blsinternational.com' }
+  };
+  var VISA = [['Almanya', 'idata'], ['İtalya', 'idata'], ['İspanya', 'bls']];
+  ['Avusturya', 'Belçika', 'Bulgaristan', 'Çekya', 'Danimarka', 'Estonya', 'Finlandiya', 'Fransa', 'Hırvatistan', 'Hollanda', 'İsveç', 'İsviçre', 'İzlanda', 'Letonya', 'Lihtenştayn', 'Litvanya', 'Lüksemburg', 'Malta', 'Norveç', 'Polonya', 'Slovakya', 'Slovenya']
+    .forEach(function (n) { VISA.push([n, 'vfs']); });
+  VISA.push(['İngiltere', 'vfs', 'uk']);
+  VISA.sort(function (a, b) { return a[0].localeCompare(b[0], 'tr'); });
+  VISA.forEach(function (v, i) { $('country').appendChild(opt(i, v[0])); });
+  $('country').value = String(VISA.findIndex(function (v) { return v[0] === 'Fransa'; }));
+  $('travelDate').value = iso(addDays(today(), 120));
+
+  function renderVisa() {
+    var v = VISA[+$('country').value], c = CENTERS[v[1]], uk = v[2] === 'uk';
+    $('centerInfo').innerHTML = '<div class="center-name">' + c.n + '</div>' +
+      '<span class="tag">' + (uk ? 'Schengen dışı' : 'Schengen') + '</span>' +
+      '<p>' + v[0] + ' için Türkiye\'deki başvurular ' + c.n + ' üzerinden alınıyor.' + (uk ? ' Başvuru önce GOV.UK üzerinden başlatılır, biyometri randevusu merkezde verilir.' : '') + '</p>' +
+      '<a class="btn" href="' + c.u + '" target="_blank" rel="noopener">' + c.n + ' sayfasını aç</a>';
+    var val = $('travelDate').value;
+    if (!val) { $('visaDates').innerHTML = '<p class="note">Tarihleri görmek için uçuş tarihini gir.</p>'; return; }
+    var fly = parse(val), t = today(), long = { day: 'numeric', month: 'long', year: 'numeric' };
+    var earliest = uk ? new Date(fly.getFullYear(), fly.getMonth() - 3, fly.getDate()) : new Date(fly.getFullYear(), fly.getMonth() - 6, fly.getDate());
+    var latest = uk ? null : addDays(fly, -15);
+    var h = '<ul class="dates"><li><span>En erken başvuru</span><b>' + fmt(earliest, long) + '</b></li>';
+    if (latest) h += '<li><span>En geç başvuru</span><b>' + fmt(latest, long) + '</b></li>';
+    h += '<li><span>Uçuş</span><b>' + fmt(fly, long) + '</b></li></ul>';
+    if (fly < t) h += '<div class="status late">Bu tarih geçmişte kaldı. Gelecekteki bir uçuş tarihi gir.</div>';
+    else if (latest && t > latest) h += '<div class="status late">Standart başvuru süresi geçti. Konsolosluğun acil başvuru seçeneklerine bak.</div>';
+    else if (t < earliest) h += '<div class="status wait">Başvuru penceresi ' + Math.ceil((earliest - t) / 864e5) + ' gün sonra açılıyor. O gün randevu aramaya başla; yoğun dönemlerde randevular hızlı doluyor.</div>';
+    else h += '<div class="status ok">Şu an başvurabilirsin. Randevu aramaya hemen başla.</div>';
+    h += '<p class="note">' + (uk ? 'İngiltere\'ye seyahatten en erken 3 ay önce başvurulabilir.' : 'Schengen kurallarına göre başvuru seyahatten en erken 6 ay, en geç 15 gün önce yapılır.') + '</p>';
+    $('visaDates').innerHTML = h;
+  }
+  $('country').addEventListener('change', renderVisa);
+  $('travelDate').addEventListener('change', renderVisa);
+
+  // ---------- başlangıç ----------
+  search(false);
+  loadDeals('IST');
+  renderVisa();
+})();
