@@ -1,0 +1,12 @@
+{
+  // Bilet Avcısı - Cloudflare Worker ayarları
+  "name": "biletavcisi",
+  "main": "worker.js",
+  "compatibility_date": "2025-09-01",
+  "assets": {
+    "directory": "./",
+    "binding": "ASSETS"
+  },
+  // Panelden eklenen değişkenler (TP_MARKER) her yayında silinmesin
+  "keep_vars": true
+}
