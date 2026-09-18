@@ -25,7 +25,7 @@ async function handleApi(request, env, ctx, ep) {
 
   // Önbellek: aynı sorgu 3-6 saat boyunca API'ye tekrar gitmez
   const cache = caches.default;
-  const cacheKey = new Request(url.toString(), { method: 'GET' });
+    const cacheKey = new Request(url.toString() + '&_m=' + (env.TP_MARKER || ''), { method: 'GET' });
   const hit = await cache.match(cacheKey);
   if (hit) return hit;
 
