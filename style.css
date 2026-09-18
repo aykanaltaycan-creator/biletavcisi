@@ -156,3 +156,14 @@ footer{border-top:1px solid var(--line);margin-top:28px;padding:22px 0 40px;colo
 .al{display:inline-flex;align-items:center;gap:8px}
 .al img{width:22px;height:22px;border-radius:4px;background:#fff}
 .src{font-size:14px;color:var(--muted);margin:10px 0 0}
+
+/* vize: belge listesi ve ücret kutusu */
+.doclist{list-style:none;padding:0;margin:14px 0 0}
+.doclist li{padding:9px 0 9px 26px;position:relative;border-top:1px solid var(--line);font-size:15px}
+.doclist li:first-child{border-top:0}
+.doclist li:before{content:"✓";position:absolute;left:2px;color:var(--cheap-ink);font-weight:700}
+.doc-group{font-size:13px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.02em;margin:14px 0 2px}
+.doc-group:first-of-type{margin-top:16px}
+.fee-box{background:var(--mid-bg);border-radius:var(--radius-s);padding:14px 16px;margin-top:16px}
+.fee-amt{font-family:var(--display);font-weight:700;font-size:30px;line-height:1}
+.fee-sub{font-size:14px;color:var(--muted);margin-top:6px}
