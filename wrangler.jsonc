@@ -15,7 +15,7 @@
   },
   // Her gün 08:00 (Türkiye saati) fiyat hafızasını günceller
   "triggers": {
-    "crons": ["0 5 * * *"]
+    "crons": ["*/5 * * * *"]
   },
   // Fiyat hafızası: rota başına son ~45 günün fiyatını saklar.
   // "id" değerini Cloudflare panelinden oluşturduğun KV namespace'inin ID'siyle değiştir.
