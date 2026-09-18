@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bilet Avcısı – Türkiye'den ucuz uçak bileti bul</title>
+<meta name="description" content="Reklamsız uçak bileti fiyat takvimi. Türkiye çıkışlı en ucuz uçuşları, fırsat biletleri ve vize başvuru merkezlerini tek yerde bul.">
+<meta property="og:title" content="Bilet Avcısı – Ucuz uçak bileti bul">
+<meta property="og:description" content="Reklamsız fiyat takvimi, fırsat biletleri ve vize başvuru rehberi.">
+<meta property="og:url" content="https://biletavcisi.net/">
+<meta property="og:locale" content="tr_TR">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E✈️%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <a class="logo" href="#ara" aria-label="Bilet Avcısı ana sayfa">
+      <span class="logo-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="#000"><path d="M21.5 15.5v-2L13 8.5V3.2a1.7 1.7 0 0 0-3.4 0v5.3l-8.5 5v2l8.5-2.6v5.2l-2.3 1.7v1.6l4-1.2 4 1.2v-1.6L13 20.1v-5.2z"/></svg>
+      </span>
+      <span class="logo-word">Bilet Avcısı</span>
+    </a>
+    <nav class="nav" aria-label="Ana menü">
+      <a href="#ara">Uçuş ara</a>
+      <a href="#firsatlar">Fırsatlar</a>
+      <a href="#vize">Vize</a>
+    </nav>
+  </header>
+
+  <section class="hero" id="ara" aria-labelledby="h1">
+    <h1 id="h1">Türkiye'den en ucuz uçuşu bul</h1>
+    <p>Reklam yok, sponsorlu sonuç yok. Ayın fiyat takvimine bak, en ucuz günü seç, bileti satan sitede tamamla.</p>
+
+    <form class="sign" id="searchForm" aria-label="Uçuş arama">
+      <div class="sign-grid">
+        <div class="field">
+          <label for="from">Nereden</label>
+          <select id="from"></select>
+        </div>
+        <div class="field">
+          <label for="to">Nereye</label>
+          <select id="to"></select>
+        </div>
+        <div class="field field-month">
+          <label for="month">Hangi ay</label>
+          <select id="month"></select>
+        </div>
+        <button class="go" type="submit">Fiyatları göster</button>
+      </div>
+      <div class="sign-row2">
+        <div class="seg" role="group" aria-label="Yolculuk türü">
+          <button type="button" data-trip="rt" aria-pressed="true">Gidiş-dönüş</button>
+          <button type="button" data-trip="ow" aria-pressed="false">Tek yön</button>
+        </div>
+        <label class="stay" id="stayWrap">Kalış
+          <select id="stay">
+            <option value="3">3 gece</option>
+            <option value="5">5 gece</option>
+            <option value="7" selected>7 gece</option>
+            <option value="10">10 gece</option>
+            <option value="14">14 gece</option>
+          </select>
+        </label>
+      </div>
+    </form>
+  </section>
+
+  <section id="sonuc" aria-live="polite"></section>
+
+  <section id="firsatlar" aria-labelledby="h-deals">
+    <h2 id="h-deals">Fırsat biletler</h2>
+    <p class="lede">Son günlerde normalin belirgin şekilde altında görülen fiyatlar. Kalkış şehrini seç.</p>
+    <div class="chips" role="group" aria-label="Kalkış şehri" id="dealChips"></div>
+    <div id="deals"></div>
+  </section>
+
+  <section id="vize" aria-labelledby="h-visa">
+    <h2 id="h-visa">Vize randevusu nereden alınır?</h2>
+    <p class="lede">Ülkeyi seç, Türkiye'de hangi merkezin başvuru aldığını ve en erken ne zaman başvurabileceğini gör.</p>
+    <div class="visa">
+      <div class="panel">
+        <div class="field">
+          <label for="country">Gideceğin ülke</label>
+          <select id="country"></select>
+        </div>
+        <div id="centerInfo"></div>
+      </div>
+      <div class="panel">
+        <div class="field">
+          <label for="travelDate">Uçuş tarihin</label>
+          <input type="date" id="travelDate">
+        </div>
+        <div id="visaDates"></div>
+      </div>
+    </div>
+    <p class="note">Merkez bilgileri Eylül 2026 itibarıyla derlendi ve değişebilir. Başvurmadan önce resmi sayfadan kontrol et. Bu site boş randevu tarihlerini taramaz.</p>
+  </section>
+
+  <footer>
+    <p>Bilet Avcısı reklamsızdır ve bilet satmaz; seni bileti satan siteye yönlendirir. Oradan bilet alırsan küçük bir komisyon alabiliriz, bu senin ödediğin fiyatı değiştirmez.</p>
+    <p>Fiyatlar, Aviasales kullanıcılarının son günlerde gördüğü en düşük fiyatlardır (veri: Travelpayouts). Anlık değişebilir; geçerli fiyat satın alma sayfasındakidir.</p>
+  </footer>
+</div>
+<script src="/app.js"></script>
+</body>
+</html>
