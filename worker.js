@@ -13,6 +13,20 @@ const DEAL_ORIGINS = ['IST', 'ESB', 'IZM', 'AYT'];
 const DEAL_MONTHS_AHEAD = 2; // bu ay + gelecek 2 ay
 const HISTORY_LEN = 45;      // her rota için saklanan gün sayısı
 const MIN_HISTORY_FOR_DEAL = 5; // karşılaştırma yapılabilmesi için gereken en az gün sayısı
+const ALERT_THRESHOLD_PCT = 25; // Telegram'a düşecek fırsat için minimum indirim yüzdesi
+const ALERT_MAX_PER_RUN = 6;    // bir taramada en fazla kaç mesaj gönderilsin
+const ALERT_COOLDOWN_DAYS = 3;  // aynı rota kaç gün boyunca tekrar paylaşılmasın
+
+// Telegram mesajlarında kullanılan kısa şehir adları
+const CITY_NAMES = {
+  IST: 'İstanbul', ESB: 'Ankara', IZM: 'İzmir', AYT: 'Antalya',
+  BCN: 'Barselona', PRG: 'Prag', ROM: 'Roma', MIL: 'Milano', PAR: 'Paris', AMS: 'Amsterdam',
+  BER: 'Berlin', MUC: 'Münih', FRA: 'Frankfurt', VIE: 'Viyana', BUD: 'Budapeşte', ATH: 'Atina',
+  LON: 'Londra', CPH: 'Kopenhag', STO: 'Stockholm', TLL: 'Tallinn', WAW: 'Varşova',
+  BEG: 'Belgrad', SJJ: 'Saraybosna', MAD: 'Madrid', LIS: 'Lizbon', ZRH: 'Zürih',
+  TBS: 'Tiflis', BAK: 'Bakü', DXB: 'Dubai', HRG: 'Hurghada', SSH: 'Şarm El Şeyh',
+  MLE: 'Maldivler', BKK: 'Bangkok', TYO: 'Tokyo', NYC: 'New York'
+};
 
 // ---------- SEO: popüler rota sayfaları ----------
 // Her biri /ucuz-ucak-bileti/<slug> adresinde, kendi başlığı ve metniyle yayınlanır.
@@ -170,7 +184,7 @@ function routePageHTML(route, cheapest) {
     '<section><h2>Diğer popüler rotalar</h2><ul class="board">' +
     others.map(r => '<li><a class="row" href="/ucuz-ucak-bileti/' + r.slug + '"><span class="route">İstanbul – ' + hesc(r.dn) + '</span><span class="when">yaklaşık ' + hesc(r.hrs) + '</span></a></li>').join('') +
     '</ul></section>' +
-        '<footer><p>Bilet Avcısı reklamsızdır ve bilet satmaz; seni bileti satan siteye yönlendirir.</p><p>Fırsatları kaçırma: <a href="https://t.me/biletavcisinet" target="_blank" rel="noopener">Telegram kanalımız</a></p></footer>' +
+    '<footer><p>Bilet Avcısı reklamsızdır ve bilet satmaz; seni bileti satan siteye yönlendirir.</p><p>Fırsatları kaçırma: <a href="https://t.me/biletavcisinet" target="_blank" rel="noopener">Telegram kanalımız</a></p></footer>' +
     '</div></body></html>';
 }
 
@@ -288,6 +302,7 @@ async function deals(q, env) {
 // ---------- fiyat hafızası (fırsat avcısı) ----------
 
 // Her gün çalışır: popüler rotaların en ucuz fiyatını bulup KV'ye tarih damgalı kaydeder.
+// Ayrıca gerçekten öne çıkan (normalden %25+ ucuz) rotaları Telegram kanalına gönderir.
 async function runDealScan(env) {
   if (!env.TP_TOKEN || !env.PRICE_HISTORY) return; // ayarlar eksikse sessizce çık
   const today = new Date().toISOString().slice(0, 10);
@@ -297,6 +312,8 @@ async function runDealScan(env) {
     const d = new Date(base.getFullYear(), base.getMonth() + i, 1);
     months.push(d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0'));
   }
+
+  const alerts = [];
 
   for (const origin of DEAL_ORIGINS) {
     const bestByDest = {};
@@ -314,14 +331,49 @@ async function runDealScan(env) {
         const dest = x.destination || x.destination_code;
         const price = Math.round(x.price ?? 0);
         if (!dest || !price) continue;
-        if (!bestByDest[dest] || price < bestByDest[dest]) bestByDest[dest] = price;
+        if (!bestByDest[dest] || price < bestByDest[dest].price) {
+          bestByDest[dest] = { price, link: x.link || null, date: x.departure_at || null };
+        }
       }
     }
-    // Bulunan her rota için bugünün fiyatını hafızaya ekle
-    for (const [dest, price] of Object.entries(bestByDest)) {
-      await appendHistory(env, origin, dest, today, price);
+    // Bulunan her rota için: önce eski hafızayla karşılaştır (fırsat mı?), sonra bugünün fiyatını ekle.
+    for (const [dest, info] of Object.entries(bestByDest)) {
+      const oldHist = await readHistory(env, origin, dest);
+      const oldBase = baseline(oldHist);
+      if (oldBase) {
+        const pct = Math.round((1 - info.price / oldBase) * 100);
+        if (pct >= ALERT_THRESHOLD_PCT) {
+          const cooled = await env.PRICE_HISTORY.get('posted:' + origin + ':' + dest);
+          if (!cooled) alerts.push({ origin, dest, price: info.price, pct, link: info.link, date: info.date });
+        }
+      }
+      await appendHistory(env, origin, dest, today, info.price);
     }
   }
+
+  // En yüksek indirimden başlayarak, en fazla ALERT_MAX_PER_RUN kadar mesaj gönder.
+  alerts.sort((a, b) => b.pct - a.pct);
+  for (const a of alerts.slice(0, ALERT_MAX_PER_RUN)) {
+    await sendDealAlert(env, a);
+    await env.PRICE_HISTORY.put('posted:' + a.origin + ':' + a.dest, '1', { expirationTtl: ALERT_COOLDOWN_DAYS * 86400 });
+  }
+}
+
+async function sendDealAlert(env, a) {
+  if (!env.TG_BOT_TOKEN || !env.TG_CHAT) return; // Telegram ayarlanmadıysa sessizce atla
+  const on = CITY_NAMES[a.origin] || a.origin, dn = CITY_NAMES[a.dest] || a.dest;
+  const link = bookLink(env, a.link, a.origin, a.dest, a.date, null);
+  const text = '✈️ ' + on + ' – ' + dn + '\n' +
+    nf(a.price) + ' TL — normalden %' + a.pct + ' ucuz\n' +
+    (a.date ? '📅 ' + trDate(a.date.slice(0, 10)) + '\n' : '') +
+    link;
+  try {
+    await fetch('https://api.telegram.org/bot' + env.TG_BOT_TOKEN + '/sendMessage', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ chat_id: env.TG_CHAT, text, disable_web_page_preview: false })
+    });
+  } catch (e) { /* Telegram'a ulaşılamazsa taramanın geri kalanını bozma */ }
 }
 
 async function readHistory(env, origin, dest) {
@@ -415,10 +467,4 @@ function clampInt(v, min, max, def) {
   const n = parseInt(v, 10);
   return Number.isFinite(n) ? Math.min(max, Math.max(min, n)) : def;
 }
-function bad(msg) { const e = new Error(msg); e.status = 400; e.userMessage = msg; return e; }
-function json(obj, status = 200, extra = {}) {
-  return new Response(JSON.stringify(obj), {
-    status,
-    headers: { 'Content-Type': 'application/json; charset=utf-8', ...extra }
-  });
-}
+function bad(msg) { const e =
