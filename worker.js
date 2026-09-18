@@ -170,7 +170,7 @@ function routePageHTML(route, cheapest) {
     '<section><h2>Diğer popüler rotalar</h2><ul class="board">' +
     others.map(r => '<li><a class="row" href="/ucuz-ucak-bileti/' + r.slug + '"><span class="route">İstanbul – ' + hesc(r.dn) + '</span><span class="when">yaklaşık ' + hesc(r.hrs) + '</span></a></li>').join('') +
     '</ul></section>' +
-    '<footer><p>Bilet Avcısı reklamsızdır ve bilet satmaz; seni bileti satan siteye yönlendirir.</p></footer>' +
+        '<footer><p>Bilet Avcısı reklamsızdır ve bilet satmaz; seni bileti satan siteye yönlendirir.</p><p>Fırsatları kaçırma: <a href="https://t.me/biletavcisinet" target="_blank" rel="noopener">Telegram kanalımız</a></p></footer>' +
     '</div></body></html>';
 }
 
