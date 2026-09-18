@@ -13,9 +13,11 @@ const DEAL_ORIGINS = ['IST', 'ESB', 'IZM', 'AYT'];
 const DEAL_MONTHS_AHEAD = 2; // bu ay + gelecek 2 ay
 const HISTORY_LEN = 45;      // her rota için saklanan gün sayısı
 const MIN_HISTORY_FOR_DEAL = 5; // karşılaştırma yapılabilmesi için gereken en az gün sayısı
-const ALERT_THRESHOLD_PCT = 25; // Telegram'a düşecek fırsat için minimum indirim yüzdesi
+const ALERT_THRESHOLD_PCT = 25; // Telegram'a "fırsat" olarak düşecek minimum indirim yüzdesi
 const ALERT_MAX_PER_RUN = 6;    // bir taramada en fazla kaç mesaj gönderilsin
-const ALERT_COOLDOWN_DAYS = 3;  // aynı rota kaç gün boyunca tekrar paylaşılmasın
+const ALERT_MIN_PER_RUN = 2;    // gerçek fırsat azsa bile en az kaç mesaj gönderilsin
+const ALERT_COOLDOWN_DAYS = 3;  // gerçek fırsat aynı rotayı kaç gün tekrar paylaşmasın
+const FILLER_COOLDOWN_DAYS = 1; // dolgu mesajı (henüz veri yok/eşik altı) kaç gün beklesin
 
 // Telegram mesajlarında kullanılan kısa şehir adları
 const CITY_NAMES = {
@@ -302,7 +304,6 @@ async function deals(q, env) {
 // ---------- fiyat hafızası (fırsat avcısı) ----------
 
 // Her gün çalışır: popüler rotaların en ucuz fiyatını bulup KV'ye tarih damgalı kaydeder.
-// Ayrıca gerçekten öne çıkan (normalden %25+ ucuz) rotaları Telegram kanalına gönderir.
 async function runDealScan(env) {
   if (!env.TP_TOKEN || !env.PRICE_HISTORY) return; // ayarlar eksikse sessizce çık
   const today = new Date().toISOString().slice(0, 10);
@@ -313,7 +314,7 @@ async function runDealScan(env) {
     months.push(d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0'));
   }
 
-  const alerts = [];
+  const candidates = [];
 
   for (const origin of DEAL_ORIGINS) {
     const bestByDest = {};
@@ -340,22 +341,38 @@ async function runDealScan(env) {
     for (const [dest, info] of Object.entries(bestByDest)) {
       const oldHist = await readHistory(env, origin, dest);
       const oldBase = baseline(oldHist);
-      if (oldBase) {
-        const pct = Math.round((1 - info.price / oldBase) * 100);
-        if (pct >= ALERT_THRESHOLD_PCT) {
-          const cooled = await env.PRICE_HISTORY.get('posted:' + origin + ':' + dest);
-          if (!cooled) alerts.push({ origin, dest, price: info.price, pct, link: info.link, date: info.date });
-        }
-      }
+      const pct = oldBase ? Math.round((1 - info.price / oldBase) * 100) : null;
+      const cooled = await env.PRICE_HISTORY.get('posted:' + origin + ':' + dest);
+      if (!cooled) candidates.push({ origin, dest, price: info.price, link: info.link, date: info.date, pct });
       await appendHistory(env, origin, dest, today, info.price);
     }
   }
 
-  // En yüksek indirimden başlayarak, en fazla ALERT_MAX_PER_RUN kadar mesaj gönder.
-  alerts.sort((a, b) => b.pct - a.pct);
-  for (const a of alerts.slice(0, ALERT_MAX_PER_RUN)) {
+  // 1) Önce gerçek fırsatları (eşiği geçenleri) seç, en yüksek indirimden başlayarak.
+  let chosen = candidates.filter(c => c.pct != null && c.pct >= ALERT_THRESHOLD_PCT)
+    .sort((a, b) => b.pct - a.pct).slice(0, ALERT_MAX_PER_RUN);
+
+  // 2) Kanal boş kalmasın: yeterli gerçek fırsat yoksa, eşiği geçmeyen ama yine de
+  //    en iyi indirimli rotalarla tamamla (indirim yüzdesi dürüstçe olduğu gibi yazılır).
+  if (chosen.length < ALERT_MIN_PER_RUN) {
+    const fillers = candidates.filter(c => c.pct != null && !chosen.includes(c))
+      .sort((a, b) => b.pct - a.pct);
+    for (const f of fillers) { if (chosen.length >= ALERT_MIN_PER_RUN) break; chosen.push(f); }
+  }
+
+  // 3) Hâlâ yetmiyorsa (fiyat hafızası henüz çok yeni, karşılaştıracak veri yok):
+  //    indirim iddiası olmadan, sadece "bugünün fiyatı" diye en ucuz rotalarla doldur.
+  if (chosen.length < ALERT_MIN_PER_RUN) {
+    const priceOnly = candidates.filter(c => c.pct == null && !chosen.includes(c))
+      .sort((a, b) => a.price - b.price);
+    for (const f of priceOnly) { if (chosen.length >= ALERT_MIN_PER_RUN) break; chosen.push(f); }
+  }
+
+  for (const a of chosen) {
     await sendDealAlert(env, a);
-    await env.PRICE_HISTORY.put('posted:' + a.origin + ':' + a.dest, '1', { expirationTtl: ALERT_COOLDOWN_DAYS * 86400 });
+    const isReal = a.pct != null && a.pct >= ALERT_THRESHOLD_PCT;
+    const ttlDays = isReal ? ALERT_COOLDOWN_DAYS : FILLER_COOLDOWN_DAYS;
+    await env.PRICE_HISTORY.put('posted:' + a.origin + ':' + a.dest, '1', { expirationTtl: ttlDays * 86400 });
   }
 }
 
@@ -363,10 +380,14 @@ async function sendDealAlert(env, a) {
   if (!env.TG_BOT_TOKEN || !env.TG_CHAT) return; // Telegram ayarlanmadıysa sessizce atla
   const on = CITY_NAMES[a.origin] || a.origin, dn = CITY_NAMES[a.dest] || a.dest;
   const link = bookLink(env, a.link, a.origin, a.dest, a.date, null);
+  const priceLine = (a.pct != null && a.pct > 0)
+    ? nf(a.price) + ' TL — normalden %' + a.pct + ' ucuz'
+    : nf(a.price) + ' TL';
   const text = '✈️ ' + on + ' – ' + dn + '\n' +
-    nf(a.price) + ' TL — normalden %' + a.pct + ' ucuz\n' +
+    priceLine + '\n' +
     (a.date ? '📅 ' + trDate(a.date.slice(0, 10)) + '\n' : '') +
-    link;
+    link +
+    (a.pct == null ? '\n\n(Bu rota için fiyat geçmişi henüz oluşuyor; birkaç gün içinde karşılaştırmalı gösterebileceğiz.)' : '');
   try {
     await fetch('https://api.telegram.org/bot' + env.TG_BOT_TOKEN + '/sendMessage', {
       method: 'POST',
@@ -467,4 +488,10 @@ function clampInt(v, min, max, def) {
   const n = parseInt(v, 10);
   return Number.isFinite(n) ? Math.min(max, Math.max(min, n)) : def;
 }
-function bad(msg) { const e =
+function bad(msg) { const e = new Error(msg); e.status = 400; e.userMessage = msg; return e; }
+function json(obj, status = 200, extra = {}) {
+  return new Response(JSON.stringify(obj), {
+    status,
+    headers: { 'Content-Type': 'application/json; charset=utf-8', ...extra }
+  });
+}
