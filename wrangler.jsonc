@@ -20,6 +20,6 @@
   // Fiyat hafızası: rota başına son ~45 günün fiyatını saklar.
   // "id" değerini Cloudflare panelinden oluşturduğun KV namespace'inin ID'siyle değiştir.
   "kv_namespaces": [
-    { "binding": "biletavcisi-fiyatlar", "id": "a41b0096821041499d08ee0d1c85143a" }
+    { "binding": "PRICE_HISTORY", "id": "a41b0096821041499d08ee0d1c85143a" }
   ]
 }
