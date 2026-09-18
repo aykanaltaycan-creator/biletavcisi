@@ -6,6 +6,12 @@ const TP = 'https://api.travelpayouts.com';
 const CODE = /^[A-Z]{3}$/;
 const MONTH = /^\d{4}-\d{2}$/;
 
+// Fiyat hafızası taranacak kalkış şehirleri ve kaç ay ileriye bakılacağı.
+const DEAL_ORIGINS = ['IST', 'ESB', 'IZM', 'AYT'];
+const DEAL_MONTHS_AHEAD = 2; // bu ay + gelecek 2 ay
+const HISTORY_LEN = 45;      // her rota için saklanan gün sayısı
+const MIN_HISTORY_FOR_DEAL = 5; // karşılaştırma yapılabilmesi için gereken en az gün sayısı
+
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
@@ -15,6 +21,12 @@ export default {
     }
     // /api dışındaki her şey: site dosyaları (index.html, app.js, style.css)
     return env.ASSETS.fetch(request);
+  },
+
+  // Her gün otomatik çalışır (bkz. wrangler.jsonc > triggers.crons).
+  // Popüler rotaların fiyatını Travelpayouts'tan çekip KV'deki fiyat hafızasına ekler.
+  async scheduled(event, env, ctx) {
+    ctx.waitUntil(runDealScan(env));
   }
 };
 
@@ -25,7 +37,7 @@ async function handleApi(request, env, ctx, ep) {
 
   // Önbellek: aynı sorgu 3-6 saat boyunca API'ye tekrar gitmez
   const cache = caches.default;
-    const cacheKey = new Request(url.toString() + '&_m=' + (env.TP_MARKER || ''), { method: 'GET' });
+  const cacheKey = new Request(url.toString(), { method: 'GET' });
   const hit = await cache.match(cacheKey);
   if (hit) return hit;
 
@@ -97,13 +109,94 @@ async function anywhere(q, env) {
 async function deals(q, env) {
   const o = code(q.get('origin'));
   const r = await tp('/aviasales/v3/get_special_offers', { origin: o, currency: 'try', locale: 'tr' }, env);
-  const list = (r.data || []).map(x => ({
+  let list = (r.data || []).map(x => ({
     ...norm(x, env),
     originName: x.origin_name || null,
     destName: x.destination_name || null,
     airlineTitle: x.airline_title || null
-  })).sort((a, b) => a.price - b.price).slice(0, 20);
-  return { origin: o, list };
+  }));
+
+  // Fiyat hafızamız varsa (KV), her teklifin gerçekten "normalden ne kadar ucuz"
+  // olduğunu kendi geçmiş verimizle hesaplayıp ekliyoruz.
+  if (env.PRICE_HISTORY) {
+    list = await Promise.all(list.map(async x => {
+      const hist = await readHistory(env, o, x.destination);
+      const base = baseline(hist);
+      const discountPct = base ? Math.round((1 - x.price / base) * 100) : null;
+      return { ...x, discountPct, baselinePrice: base };
+    }));
+    // Önce en yüksek gerçek indirim, sonra en düşük fiyat
+    list.sort((a, b) => (b.discountPct ?? -999) - (a.discountPct ?? -999) || a.price - b.price);
+  } else {
+    list.sort((a, b) => a.price - b.price);
+  }
+
+  return { origin: o, list: list.slice(0, 20) };
+}
+
+// ---------- fiyat hafızası (fırsat avcısı) ----------
+
+// Her gün çalışır: popüler rotaların en ucuz fiyatını bulup KV'ye tarih damgalı kaydeder.
+async function runDealScan(env) {
+  if (!env.TP_TOKEN || !env.PRICE_HISTORY) return; // ayarlar eksikse sessizce çık
+  const today = new Date().toISOString().slice(0, 10);
+  const months = [];
+  const base = new Date();
+  for (let i = 0; i <= DEAL_MONTHS_AHEAD; i++) {
+    const d = new Date(base.getFullYear(), base.getMonth() + i, 1);
+    months.push(d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0'));
+  }
+
+  for (const origin of DEAL_ORIGINS) {
+    const bestByDest = {};
+    for (const month of months) {
+      let r;
+      try {
+        r = await tp('/aviasales/v3/prices_for_dates', {
+          origin, departure_at: month, unique: 'true', sorting: 'price',
+          direct: 'false', limit: '100', page: '1', currency: 'try', one_way: 'true'
+        }, env);
+      } catch (e) {
+        continue; // bu ay/şehir için veri alınamadıysa diğerlerine devam et
+      }
+      for (const x of (r.data || [])) {
+        const dest = x.destination || x.destination_code;
+        const price = Math.round(x.price ?? 0);
+        if (!dest || !price) continue;
+        if (!bestByDest[dest] || price < bestByDest[dest]) bestByDest[dest] = price;
+      }
+    }
+    // Bulunan her rota için bugünün fiyatını hafızaya ekle
+    for (const [dest, price] of Object.entries(bestByDest)) {
+      await appendHistory(env, origin, dest, today, price);
+    }
+  }
+}
+
+async function readHistory(env, origin, dest) {
+  try {
+    const raw = await env.PRICE_HISTORY.get('hist:' + origin + ':' + dest);
+    return raw ? JSON.parse(raw) : [];
+  } catch (e) {
+    return [];
+  }
+}
+
+async function appendHistory(env, origin, dest, dateStr, price) {
+  const key = 'hist:' + origin + ':' + dest;
+  let hist = await readHistory(env, origin, dest);
+  hist = hist.filter(h => h.d !== dateStr); // aynı gün tekrar çalışırsa üzerine yaz
+  hist.push({ d: dateStr, p: price });
+  if (hist.length > HISTORY_LEN) hist = hist.slice(hist.length - HISTORY_LEN);
+  await env.PRICE_HISTORY.put(key, JSON.stringify(hist), { expirationTtl: 90 * 86400 });
+}
+
+// Geçmiş fiyatların medyanını (tipik fiyat) döndürür; yeterli veri yoksa null.
+function baseline(hist) {
+  if (!hist || hist.length < MIN_HISTORY_FOR_DEAL) return null;
+  const vals = hist.map(h => h.p).sort((a, b) => a - b);
+  const mid = Math.floor(vals.length / 2);
+  return vals.length % 2 ? vals[mid] : Math.round((vals[mid - 1] + vals[mid]) / 2);
 }
 
 // ---------- yardımcılar ----------
