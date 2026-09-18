@@ -356,7 +356,32 @@
     renderVisaDates(v, v[2] === 'uk');
   });
 
+  // ---------- popüler rotalar (SEO sayfalarına bağlantı) ----------
+  var ROUTE_LINKS = [
+    ['istanbul-roma', 'Roma', '2 saat 35 dakika'], ['istanbul-barselona', 'Barselona', '4 saat 5 dakika'],
+    ['istanbul-berlin', 'Berlin', '3 saat 5 dakika'], ['istanbul-londra', 'Londra', '4 saat 5 dakika'],
+    ['istanbul-amsterdam', 'Amsterdam', '3 saat 40 dakika'], ['istanbul-paris', 'Paris', '3 saat 50 dakika'],
+    ['istanbul-atina', 'Atina', '1 saat 20 dakika'], ['istanbul-budapeste', 'Budapeşte', '1 saat 50 dakika'],
+    ['istanbul-prag', 'Prag', '2 saat 35 dakika'], ['istanbul-viyana', 'Viyana', '2 saat 10 dakika'],
+    ['istanbul-dubai', 'Dubai', '4 saat 50 dakika'], ['istanbul-milano', 'Milano', '3 saat 5 dakika'],
+    ['istanbul-tiflis', 'Tiflis', '2 saat 5 dakika'], ['istanbul-baku', 'Bakü', '2 saat 40 dakika']
+  ];
+  (function renderRouteLinks() {
+    var h = '';
+    ROUTE_LINKS.forEach(function (r) {
+      h += '<li><a class="row" href="/ucuz-ucak-bileti/' + r[0] + '"><span class="route">İstanbul – ' + esc(r[1]) + '</span><span class="when">yaklaşık ' + esc(r[2]) + '</span></a></li>';
+    });
+    $('routeLinks').innerHTML = h;
+  })();
+
   // ---------- başlangıç ----------
+  // Rota sayfasından "?from=IST&to=BCN" ile gelindiyse o rotayı otomatik yükle.
+  (function applyUrlParams() {
+    var p = new URLSearchParams(location.search);
+    var f = (p.get('from') || '').toUpperCase(), t = (p.get('to') || '').toUpperCase();
+    if (f && TR.some(function (x) { return x.c === f; })) { state.from = f; $('from').value = f; fillTo(); }
+    if (t) { state.to = t; $('to').value = t; if ($('to').value !== t) $('to').value = 'ANY'; }
+  })();
   search(false);
   loadDeals('IST');
   renderVisa();
