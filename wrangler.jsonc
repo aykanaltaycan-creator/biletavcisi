@@ -7,6 +7,8 @@
     "directory": "./",
     "binding": "ASSETS"
   },
-  // Panelden eklenen değişkenler (TP_MARKER) her yayında silinmesin
-  "keep_vars": true
+  // Travelpayouts Partner ID (gizli değil)
+  "vars": {
+    "TP_MARKER": "779049"
+  }
 }
