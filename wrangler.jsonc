@@ -7,8 +7,19 @@
     "directory": "./",
     "binding": "ASSETS"
   },
-  // Travelpayouts Partner ID (gizli değil)
+  // Panelden eklenen değişkenler (TP_TOKEN, TP_MARKER) her yayında silinmesin
+  "keep_vars": true,
+  // Travelpayouts Partner ID (gizli değil, buradan yönetiliyor)
   "vars": {
     "TP_MARKER": "779049"
-  }
+  },
+  // Her gün 08:00 (Türkiye saati) fiyat hafızasını günceller
+  "triggers": {
+    "crons": ["0 5 * * *"]
+  },
+  // Fiyat hafızası: rota başına son ~45 günün fiyatını saklar.
+  // "id" değerini Cloudflare panelinden oluşturduğun KV namespace'inin ID'siyle değiştir.
+  "kv_namespaces": [
+    { "binding": "biletavcisi-fiyatlar", "id": "a41b0096821041499d08ee0d1c85143a" }
+  ]
 }
