@@ -547,7 +547,7 @@ function routePageHTML(route, cheapest) {
         { '@type': 'Question', name: route.dn + '\'a en ucuz ne zaman gidilir?', acceptedAnswer: { '@type': 'Answer', text: route.tips } }
       ]
     }).replace(/</g, '\\u003c') + '</script>' +
-    '</head><body><div class="wrap">' +
+    '<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon=\'{"token": "891fd3e67de645aa9908b65d9daf1636"}\'></script></head><body><div class="wrap">' +
     '<header class="top"><a class="logo" href="/"><span class="logo-mark"><svg viewBox="0 0 24 24" fill="#000"><path d="M21.5 15.5v-2L13 8.5V3.2a1.7 1.7 0 0 0-3.4 0v5.3l-8.5 5v2l8.5-2.6v5.2l-2.3 1.7v1.6l4-1.2 4 1.2v-1.6L13 20.1v-5.2z"/></svg></span><span class="logo-word">Bilet Avcısı</span></a>' +
     '<nav class="nav"><a href="/">Anasayfa</a><a href="/#firsatlar">Fırsatlar</a><a href="/#vize">Vize</a></nav></header>' +
     '<section class="hero"><h1>İstanbul\'dan ' + hesc(route.dn) + '\'a Ucuz Uçak Bileti</h1>' +
@@ -593,7 +593,7 @@ async function handleGuidePage(guide, env, ctx) {
     '<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">' +
     '<link rel="stylesheet" href="/style.css">' +
     '<style>.guide-body h2{font-family:var(--display);font-weight:700;font-size:24px;margin:28px 0 8px}.guide-body p,.guide-body li{line-height:1.65}.guide-body ol{padding-left:22px}.guide-body li{margin-bottom:8px}</style>' +
-    '</head><body><div class="wrap">' +
+    '<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon=\'{"token": "891fd3e67de645aa9908b65d9daf1636"}\'></script></head><body><div class="wrap">' +
     '<header class="top"><a class="logo" href="/"><span class="logo-mark"><svg viewBox="0 0 24 24" fill="#000"><path d="M21.5 15.5v-2L13 8.5V3.2a1.7 1.7 0 0 0-3.4 0v5.3l-8.5 5v2l8.5-2.6v5.2l-2.3 1.7v1.6l4-1.2 4 1.2v-1.6L13 20.1v-5.2z"/></svg></span><span class="logo-word">Bilet Avcısı</span></a>' +
     '<nav class="nav"><a href="/">Anasayfa</a><a href="/#firsatlar">Fırsatlar</a><a href="/#rehberler">Rehberler</a><a href="/#vize">Vize</a></nav></header>' +
     '<section class="hero"><h1>' + hesc(guide.title) + '</h1><p>' + hesc(guide.desc) + '</p></section>' +
