@@ -77,6 +77,67 @@ const ROUTE_PAGES = [
     tips: 'Formula 1 gibi büyük etkinlik dönemleri (genellikle sonbahar) hariç, fiyatlar yıl boyunca nispeten istikrarlı seyrediyor.' }
 ];
 
+// ---------- SEO: seyahat rehberleri ----------
+// Her biri /rehber/<slug> adresinde. Yeni bir rehber eklemek için bu diziye
+// {slug, title, desc, bodyHtml} formatında bir nesne eklemen yeterli.
+const GUIDE_PAGES = [
+  {
+    slug: 'yurtdisi-esim-nasil-alinir',
+    title: 'Yurt Dışına Çıkarken eSIM Nasıl Alınır?',
+    desc: 'Roaming yerine eSIM kullanmak neden daha ucuz ve pratik? Adım adım nasıl alınıp kurulur, hangi telefonlar destekliyor.',
+    bodyHtml: `
+      <p>Yurt dışına çıkan hemen herkesin karşılaştığı ilk sorun aynı: havaalanına iner inmez internete nasıl bağlanılır? Telefon operatörünün roaming paketi genelde en pahalı seçenek. Son birkaç yıldır çok daha ucuz ve pratik bir alternatif var: <strong>eSIM</strong>.</p>
+
+      <h2>eSIM nedir, normal SIM karttan farkı ne?</h2>
+      <p>eSIM, telefonuna takılan fiziksel bir kart değil; telefonun içine dijital olarak kurulan bir hat profili. Bir QR kodu okutarak birkaç dakikada kuruluyor, kargo beklemek ya da havaalanında SIM kart standı aramak gerekmiyor. Mevcut Türkiye hattın telefonda kalmaya devam ediyor, eSIM sadece veri (internet) için ikinci bir hat gibi ekleniyor.</p>
+
+      <h2>Telefonum eSIM destekliyor mu?</h2>
+      <p>iPhone XS ve sonrası tüm iPhone modelleri, çoğu 2019 sonrası Samsung Galaxy (S20 ve sonrası, bazı Note modelleri), Google Pixel 3 ve sonrası eSIM destekliyor. Kesin olarak öğrenmek için telefonun <strong>Ayarlar → Hücresel/Mobil Şebeke</strong> bölümünde "eSIM Ekle" ya da "Add eSIM" seçeneği olup olmadığına bakmak yeterli.</p>
+
+      <h2>Nasıl satın alınıp kurulur?</h2>
+      <ol>
+        <li>Gideceğin ülke veya bölge için bir eSIM sağlayıcısının uygulamasından ya da sitesinden uygun veri paketini seçip ödemeyi yap.</li>
+        <li>Sana bir QR kod gönderilir.</li>
+        <li>Telefonunda Ayarlar → Hücresel Şebeke → eSIM Ekle diyip bu QR kodu okut.</li>
+        <li>Uçuştan <strong>önce, evindeki Wi-Fi'dayken</strong> kurulumu tamamla — kurulum internet gerektirir, havaalanında Wi-Fi aramakla uğraşmak istemezsin.</li>
+        <li>Uçaktan inince telefon ayarlarından yeni hattı "açık" konuma getirmen yeterli, otomatik bağlanır.</li>
+      </ol>
+
+      <h2>Hangi sağlayıcıya bakmalı?</h2>
+      <p>Airalo, Holafly ve Ubigi gibi birkaç tanınmış sağlayıcı var. Aralarındaki fark genelde şu noktalarda toplanıyor: kaç ülkeyi tek pakette kapsadığı (Avrupa turlarında "bölgesel" paketler tek tek ülke almaktan daha avantajlı olabiliyor), veri sınırının sabit mi yoksa "sınırsız ama yavaşlatmalı" mı olduğu, ve destek dilinin Türkçe olup olmadığı. Satın almadan önce güncel fiyat ve kapsama alanını sağlayıcının kendi sitesinden kontrol etmek en sağlıklısı, çünkü paketler sık güncelleniyor.</p>
+
+      <h2>Pratik bir ipucu</h2>
+      <p>WhatsApp, Telegram gibi uygulamalar üzerinden mesajlaşma ve arama internet üzerinden çalıştığı için, çoğu seyahatte yerel bir telefon numarasına ihtiyaç duyulmuyor — sadece veri (data) paketi yeterli oluyor. Bu da eSIM'i daha da pratik kılıyor.</p>
+    `
+  },
+  {
+    slug: 'ucuz-otel-hostel-nasil-bulunur',
+    title: 'Seyahatte Ucuz Otel ve Hostel Nasıl Bulunur?',
+    desc: 'Karşılaştırma siteleri nasıl kullanılır, hostel mi otel mi seçilmeli, rezervasyonu ne zaman yapmalı? Pratik bir rehber.',
+    bodyHtml: `
+      <p>Uçak biletini bulduktan sonra sırada konaklama var. Doğru yerde, doğru fiyata kalmak birkaç basit alışkanlıkla kolaylaşıyor.</p>
+
+      <h2>Tek tek otel sitesine bakma, karşılaştır</h2>
+      <p>Her otelin kendi sitesine tek tek girip fiyat karşılaştırmak yerine, birden fazla kaynağı aynı anda gösteren karşılaştırma siteleri zaman kazandırır. Bizim de kullandığımız Aviasales'in kardeş servisi Hotellook, 250 binden fazla oteli tek ekranda karşılaştırıyor.</p>
+
+      <h2>Otel mi, hostel mi?</h2>
+      <p>Hostel'ler genelde paylaşımlı oda seçeneğiyle bütçe seyahatinde en ucuz seçenek; ayrıca ortak mutfak ve sosyal alanlar sayesinde tek başına seyahat edenler için insan tanımak da kolaylaşıyor. Mahremiyet önemliyse hostel'lerin "özel oda" seçenekleri de genelde standart bir otel odasından daha ucuza geliyor.</p>
+
+      <h2>Ne zaman rezervasyon yapmalı?</h2>
+      <p>Genel bir kural olarak seyahatten <strong>2 ila 8 hafta önce</strong> bakmak iyi bir denge sağlıyor — çok erken bakıldığında fiyatlar henüz netleşmemiş olabiliyor, son ana bırakıldığında ise popüler tarihlerde seçenek daralıyor. Mümkünse <strong>ücretsiz iptal edilebilir</strong> bir rezervasyon seçmek, fiyat daha da düşerse yeniden rezervasyon yapabilme esnekliği tanıyor.</p>
+
+      <h2>Konum seçimi</h2>
+      <p>En ucuz otel her zaman en iyi seçim olmuyor. Şehir merkezine veya toplu taşıma durağına olan uzaklığı, gece geç saatte dönerken güvenli bir bölge olup olmadığını da hesaba katmak, taksi/ulaşım masrafında geri dönüyor.</p>
+
+      <h2>Yorumları nasıl okumalı</h2>
+      <p>Puan ortalamasından çok, <strong>yakın tarihli</strong> yorumlara bakmak daha güvenilir — bir otel zamanla değişebilir. Az sayıda yorumla yüksek puan almış bir yere temkinli yaklaşmakta fayda var. Temizlik ve konumdan bahseden yorumlar genelde en somut bilgiyi veriyor.</p>
+
+      <h2>Vize başvurusuyla bağlantısı</h2>
+      <p><a href="/#vize">Vize rehberimizde</a> de belirttiğimiz gibi, birçok ülke başvuru sırasında bir konaklama rezervasyon belgesi istiyor. Bu yüzden vize başvurusu öncesinde ücretsiz iptal edilebilir bir rezervasyon yapmak, hem belgeyi hazırlamış olmak hem de plan değişirse zarar etmemek için işe yarıyor.</p>
+    `
+  }
+];
+
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
@@ -89,6 +150,12 @@ export default {
       const route = ROUTE_PAGES.find(r => r.slug === slug);
       if (route) return handleRoutePage(route, env, ctx);
       // Bilinmeyen slug: gerçek siteye yönlendir, 404 çöplüğü oluşturma
+      return Response.redirect(SITE + '/', 302);
+    }
+    if (url.pathname.startsWith('/rehber/')) {
+      const slug = url.pathname.split('/')[2] || '';
+      const guide = GUIDE_PAGES.find(g => g.slug === slug);
+      if (guide) return handleGuidePage(guide, env, ctx);
       return Response.redirect(SITE + '/', 302);
     }
     if (url.pathname === '/sitemap.xml') return sitemap();
@@ -192,9 +259,50 @@ function routePageHTML(route, cheapest) {
 
 function sitemap() {
   const entries = ['<url><loc>' + SITE + '/</loc><changefreq>daily</changefreq></url>']
-    .concat(ROUTE_PAGES.map(r => '<url><loc>' + SITE + '/ucuz-ucak-bileti/' + r.slug + '</loc><changefreq>daily</changefreq></url>'));
+    .concat(ROUTE_PAGES.map(r => '<url><loc>' + SITE + '/ucuz-ucak-bileti/' + r.slug + '</loc><changefreq>daily</changefreq></url>'))
+    .concat(GUIDE_PAGES.map(g => '<url><loc>' + SITE + '/rehber/' + g.slug + '</loc><changefreq>weekly</changefreq></url>'));
   const xml = '<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' + entries.join('') + '</urlset>';
   return new Response(xml, { headers: { 'Content-Type': 'application/xml; charset=utf-8' } });
+}
+
+// ---------- rehber sayfası ----------
+
+async function handleGuidePage(guide, env, ctx) {
+  const cache = caches.default;
+  const cacheKey = new Request(SITE + '/rehber/' + guide.slug, { method: 'GET' });
+  const hit = await cache.match(cacheKey);
+  if (hit) return hit;
+
+  const others = GUIDE_PAGES.filter(g => g.slug !== guide.slug);
+  const html = '<!DOCTYPE html><html lang="tr"><head><meta charset="UTF-8">' +
+    '<meta name="viewport" content="width=device-width, initial-scale=1">' +
+    '<title>' + hesc(guide.title) + ' | Bilet Avcısı</title>' +
+    '<meta name="description" content="' + hesc(guide.desc) + '">' +
+    '<link rel="canonical" href="' + SITE + '/rehber/' + guide.slug + '">' +
+    '<meta property="og:title" content="' + hesc(guide.title) + '">' +
+    '<meta property="og:description" content="' + hesc(guide.desc) + '">' +
+    '<meta property="og:locale" content="tr_TR">' +
+    '<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'%3E%3Ctext y=\'.9em\' font-size=\'90\'%3E%E2%9C%88%EF%B8%8F%3C/text%3E%3C/svg%3E">' +
+    '<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>' +
+    '<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">' +
+    '<link rel="stylesheet" href="/style.css">' +
+    '<style>.guide-body h2{font-family:var(--display);font-weight:700;font-size:24px;margin:28px 0 8px}.guide-body p,.guide-body li{line-height:1.65}.guide-body ol{padding-left:22px}.guide-body li{margin-bottom:8px}</style>' +
+    '</head><body><div class="wrap">' +
+    '<header class="top"><a class="logo" href="/"><span class="logo-mark"><svg viewBox="0 0 24 24" fill="#000"><path d="M21.5 15.5v-2L13 8.5V3.2a1.7 1.7 0 0 0-3.4 0v5.3l-8.5 5v2l8.5-2.6v5.2l-2.3 1.7v1.6l4-1.2 4 1.2v-1.6L13 20.1v-5.2z"/></svg></span><span class="logo-word">Bilet Avcısı</span></a>' +
+    '<nav class="nav"><a href="/">Anasayfa</a><a href="/#firsatlar">Fırsatlar</a><a href="/#rehberler">Rehberler</a><a href="/#vize">Vize</a></nav></header>' +
+    '<section class="hero"><h1>' + hesc(guide.title) + '</h1><p>' + hesc(guide.desc) + '</p></section>' +
+    '<section><div class="detail guide-body">' + guide.bodyHtml + '</div></section>' +
+    '<section><h2>Diğer rehberler</h2><ul class="board">' +
+    others.map(g => '<li><a class="row" href="/rehber/' + g.slug + '"><span class="route">' + hesc(g.title) + '</span></a></li>').join('') +
+    '</ul></section>' +
+    '<footer><p>Bilet Avcısı reklamsızdır ve bilet satmaz; seni bileti satan siteye yönlendirir.</p><p>Fırsatları kaçırma: <a href="https://t.me/biletavcisinet" target="_blank" rel="noopener">Telegram kanalımız</a></p></footer>' +
+    '</div></body></html>';
+
+  const res = new Response(html, {
+    headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'public, max-age=21600' }
+  });
+  ctx.waitUntil(cache.put(cacheKey, res.clone()));
+  return res;
 }
 
 async function handleApi(request, env, ctx, ep) {
