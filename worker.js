@@ -649,7 +649,14 @@ async function calendar(q, env) {
   const stay = clampInt(q.get('stay'), 1, 30, 7);
 
   const p = { origin: o, destination: d, departure_at: month, group_by: 'departure_at', currency: 'try' };
-  if (rt) { p.min_trip_duration = stay; p.max_trip_duration = stay; }
+  if (rt) {
+    // Tam olarak seçilen gece sayısını değil, etrafındaki makul bir aralığı arıyoruz.
+    // Yoksa "7 gece" seçince 6 veya 8 geceli çok daha ucuz bir bilet varken bile
+    // "sonuç yok" görünebiliyordu.
+    const tol = stay <= 4 ? 1 : stay <= 7 ? 2 : 3;
+    p.min_trip_duration = Math.max(1, stay - tol);
+    p.max_trip_duration = stay + tol;
+  }
   const r = await tp('/aviasales/v3/grouped_prices', p, env);
   let days = Object.values(r.data || {}).map(t => norm(t, env));
   if (rt) days = days.filter(t => t.ret);
