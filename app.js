@@ -5,8 +5,7 @@
   var TR = [
     { c: 'IST', n: 'İstanbul', s: 'İST + SAW' }, { c: 'ESB', n: 'Ankara' }, { c: 'IZM', n: 'İzmir' },
     { c: 'AYT', n: 'Antalya' }, { c: 'ADA', n: 'Adana' }, { c: 'TZX', n: 'Trabzon' },
-    { c: 'GZT', n: 'Gaziantep' }, { c: 'DLM', n: 'Dalaman' }, { c: 'BJV', n: 'Bodrum' },
-    { c: 'OSL', n: 'Oslo', intl: true } // deneme: Türkiye dışı bir çıkış şehri
+    { c: 'GZT', n: 'Gaziantep' }, { c: 'DLM', n: 'Dalaman' }, { c: 'BJV', n: 'Bodrum' }
   ];
   // "Nereye" listesinde çıkan yurt dışı şehirler
   var INTL = [
@@ -42,6 +41,10 @@
     ['BUE', 'Buenos Aires', 'Amerika'], ['HAV', 'Havana', 'Amerika'], ['CUN', 'Cancun', 'Amerika'], ['MEX', 'Meksiko', 'Amerika']
   ];
   var INTL_REGIONS = ['Avrupa', 'Kafkasya', 'Ortadoğu', 'Afrika', 'Asya', 'Amerika'];
+  // "Nereden" ve "Nereye" listelerinin ikisi de bu tek havuzdan besleniyor,
+  // böylece herhangi bir şehirden herhangi bir şehre arama yapılabiliyor.
+  var ALL_REGIONS = ['Yurt içi'].concat(INTL_REGIONS);
+  var ALL_CITIES = TR.map(function (x) { return [x.c, x.n + (x.s ? ' (' + x.s + ')' : ''), 'Yurt içi']; }).concat(INTL);
   // API'den gelen kodların Türkçe adları (listede olmayanlar kod olarak görünür)
   var NAMES = {
     SAW: 'İstanbul', ADB: 'İzmir', VAN: 'Van', DIY: 'Diyarbakır', ERZ: 'Erzurum', KYA: 'Konya', ASR: 'Kayseri',
@@ -108,25 +111,45 @@
   var state = { from: 'IST', to: 'BCN', ym: null, rt: true, stay: 7, sel: null, days: [] };
 
   // ---------- form ----------
-  TR.forEach(function (x) { $('from').appendChild(opt(x.c, x.n + (x.s ? ' (' + x.s + ')' : ''))); });
-  function fillTo() {
-    var sel = $('to'), cur = sel.value || state.to, from = $('from').value;
-    sel.innerHTML = '';
-    sel.appendChild(opt('ANY', 'Her yer (en ucuzlar)'));
-    INTL_REGIONS.forEach(function (region) {
-      var items = INTL.filter(function (x) { return x[2] === region; })
+  function hasOption(selEl, val) {
+    for (var i = 0; i < selEl.options.length; i++) if (selEl.options[i].value === val) return true;
+    return false;
+  }
+  function populateSelect(selEl, excludeCode, addAny) {
+    selEl.innerHTML = '';
+    if (addAny) selEl.appendChild(opt('ANY', 'Her yer (en ucuzlar)'));
+    ALL_REGIONS.forEach(function (region) {
+      var items = ALL_CITIES.filter(function (x) { return x[2] === region && x[0] !== excludeCode; })
         .sort(function (a, b) { return a[1].localeCompare(b[1], 'tr'); });
       if (!items.length) return;
       var g = document.createElement('optgroup'); g.label = region;
       items.forEach(function (x) { g.appendChild(opt(x[0], x[1])); });
-      sel.appendChild(g);
+      selEl.appendChild(g);
     });
-    var g2 = document.createElement('optgroup'); g2.label = 'Yurt içi';
-    TR.forEach(function (x) { if (x.c !== from && !x.intl) g2.appendChild(opt(x.c, x.n)); });
-    sel.appendChild(g2);
-    sel.value = cur === from ? 'ANY' : cur;
-    if (!sel.value) sel.value = 'ANY';
   }
+  function fillTo() {
+    var from = $('from').value, cur = $('to').value || state.to;
+    populateSelect($('to'), from, true);
+    $('to').value = hasOption($('to'), cur) && cur !== from ? cur : 'ANY';
+    $('swapBtn').disabled = ($('to').value === 'ANY');
+  }
+  function fillFrom() {
+    var to = $('to').value, cur = $('from').value || state.from;
+    populateSelect($('from'), to === 'ANY' ? null : to, false);
+    $('from').value = hasOption($('from'), cur) ? cur : 'IST';
+  }
+  populateSelect($('from'), null, false); $('from').value = state.from;
+  fillTo();
+  $('from').addEventListener('change', fillTo);
+  $('to').addEventListener('change', fillFrom);
+  $('swapBtn').addEventListener('click', function () {
+    if ($('to').value === 'ANY') return; // takas için somut bir hedef gerekiyor
+    var f = $('from').value, t = $('to').value;
+    populateSelect($('from'), null, false); $('from').value = t;
+    populateSelect($('to'), t, true); $('to').value = f;
+    state.from = t; state.to = f; state.sel = null;
+    search(true);
+  });
   (function fillMonths() {
     var t = today();
     for (var i = 0; i < 12; i++) {
@@ -135,8 +158,6 @@
     }
     $('month').selectedIndex = 1; state.ym = $('month').value;
   })();
-  $('from').value = state.from; fillTo(); $('to').value = state.to;
-  $('from').addEventListener('change', fillTo);
 
   document.querySelectorAll('.seg button').forEach(function (b) {
     b.addEventListener('click', function () {
@@ -248,6 +269,8 @@
     if (x.originAirport && x.destinationAirport) h += '<dt>Havalimanı</dt><dd>' + esc(x.originAirport) + ' – ' + esc(x.destinationAirport) + '</dd>';
     h += '</dl><a class="btn" href="' + esc(x.link) + '" target="_blank" rel="noopener">Bileti satın alma sayfasında aç</a>';
     h += '<p class="note">Bu fiyat son günlerde görülen en düşük fiyat. Satın alma sayfasında değişmiş olabilir.</p>';
+    h += '<p class="note">Tanımadığın küçük bir acenteye yönlendirilirsen, ödemeden önce adını hızlıca aratıp yorumlarına bakmanı öneririz. Çok düşük fiyatlar genelde acentenin düşük kâr marjından gelir; bu tek başına bir sorun değildir, ama iade ve değişiklik süreçleri büyük sitelere göre daha yavaş olabiliyor.</p>';
+    h += '<p class="note">Satın almadan önce: ad-soyadının pasaporttaki hâliyle birebir aynı olduğundan, gerekiyorsa pasaport numarasının doğru girildiğinden ve tarihlerin doğru olduğundan emin ol. Bagaj hakkının fiyata dahil olup olmadığını da kontrol et — en ucuz biletlerde genelde sadece küçük bir el çantası hakkı bulunuyor.</p>';
     return h;
   }
 
