@@ -517,6 +517,7 @@ function trDate(iso) {
   return p[2] + ' ' + months[p[1] - 1] + ' ' + p[0];
 }
 function nf(n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, '.'); }
+function tgEsc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
 function hesc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
 
 function routePageHTML(route, cheapest) {
@@ -838,16 +839,17 @@ async function sendDealAlert(env, a) {
   const priceLine = (a.pct != null && a.pct > 0)
     ? nf(a.price) + ' TL — normalden %' + a.pct + ' ucuz'
     : nf(a.price) + ' TL';
-  const text = '✈️ ' + on + ' – ' + dn + '\n' +
-    priceLine + '\n' +
-    (a.date ? '📅 ' + trDate(a.date.slice(0, 10)) + '\n' : '') +
-    link +
-    (a.pct == null ? '\n\n(Bu rota için fiyat geçmişi henüz oluşuyor; birkaç gün içinde karşılaştırmalı gösterebileceğiz.)' : '');
+  // HTML formatı: uzun linkin kendisi yerine kısa, tıklanabilir bir yazı gösterilir.
+  const text = '✈️ <b>' + tgEsc(on) + ' – ' + tgEsc(dn) + '</b>\n' +
+    tgEsc(priceLine) + '\n' +
+    (a.date ? '📅 ' + tgEsc(trDate(a.date.slice(0, 10))) + '\n' : '') +
+    '<a href="' + tgEsc(link) + '">✈️ Bileti gör ve satın al</a>' +
+    (a.pct == null ? '\n\n<i>Bu rota için fiyat geçmişi henüz oluşuyor; birkaç gün içinde karşılaştırmalı gösterebileceğiz.</i>' : '');
   try {
     await fetch('https://api.telegram.org/bot' + env.TG_BOT_TOKEN + '/sendMessage', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ chat_id: env.TG_CHAT, text, disable_web_page_preview: false })
+      body: JSON.stringify({ chat_id: env.TG_CHAT, text, parse_mode: 'HTML', disable_web_page_preview: false })
     });
   } catch (e) { /* Telegram'a ulaşılamazsa taramanın geri kalanını bozma */ }
 }
