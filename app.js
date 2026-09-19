@@ -374,6 +374,19 @@
     $('routeLinks').innerHTML = h;
   })();
 
+  // ---------- rehberler (SEO sayfalarına bağlantı) ----------
+  var GUIDE_LINKS = [
+    ['yurtdisi-esim-nasil-alinir', 'Yurt Dışına Çıkarken eSIM Nasıl Alınır?'],
+    ['ucuz-otel-hostel-nasil-bulunur', 'Seyahatte Ucuz Otel ve Hostel Nasıl Bulunur?']
+  ];
+  (function renderGuideLinks() {
+    var h = '';
+    GUIDE_LINKS.forEach(function (g) {
+      h += '<li><a class="row" href="/rehber/' + g[0] + '"><span class="route">' + esc(g[1]) + '</span></a></li>';
+    });
+    $('guideLinks').innerHTML = h;
+  })();
+
   // ---------- başlangıç ----------
   // Rota sayfasından "?from=IST&to=BCN" ile gelindiyse o rotayı otomatik yükle.
   (function applyUrlParams() {
