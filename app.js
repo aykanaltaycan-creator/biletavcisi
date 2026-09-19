@@ -5,7 +5,8 @@
   var TR = [
     { c: 'IST', n: 'İstanbul', s: 'İST + SAW' }, { c: 'ESB', n: 'Ankara' }, { c: 'IZM', n: 'İzmir' },
     { c: 'AYT', n: 'Antalya' }, { c: 'ADA', n: 'Adana' }, { c: 'TZX', n: 'Trabzon' },
-    { c: 'GZT', n: 'Gaziantep' }, { c: 'DLM', n: 'Dalaman' }, { c: 'BJV', n: 'Bodrum' }
+    { c: 'GZT', n: 'Gaziantep' }, { c: 'DLM', n: 'Dalaman' }, { c: 'BJV', n: 'Bodrum' },
+    { c: 'OSL', n: 'Oslo', intl: true } // deneme: Türkiye dışı bir çıkış şehri
   ];
   // "Nereye" listesinde çıkan yurt dışı şehirler
   var INTL = [
@@ -90,7 +91,7 @@
     var g1 = document.createElement('optgroup'); g1.label = 'Yurt dışı';
     INTL.slice().sort(function (a, b) { return a[1].localeCompare(b[1], 'tr'); }).forEach(function (x) { g1.appendChild(opt(x[0], x[1])); });
     var g2 = document.createElement('optgroup'); g2.label = 'Yurt içi';
-    TR.forEach(function (x) { if (x.c !== from) g2.appendChild(opt(x.c, x.n)); });
+    TR.forEach(function (x) { if (x.c !== from && !x.intl) g2.appendChild(opt(x.c, x.n)); });
     sel.appendChild(g1); sel.appendChild(g2);
     sel.value = cur === from ? 'ANY' : cur;
     if (!sel.value) sel.value = 'ANY';
@@ -377,7 +378,17 @@
   // ---------- rehberler (SEO sayfalarına bağlantı) ----------
   var GUIDE_LINKS = [
     ['yurtdisi-esim-nasil-alinir', 'Yurt Dışına Çıkarken eSIM Nasıl Alınır?'],
-    ['ucuz-otel-hostel-nasil-bulunur', 'Seyahatte Ucuz Otel ve Hostel Nasıl Bulunur?']
+    ['ucuz-otel-hostel-nasil-bulunur', 'Seyahatte Ucuz Otel ve Hostel Nasıl Bulunur?'],
+    ['yurt-disi-cikis-harci-2026', '2026 Yurt Dışı Çıkış Harcı Ne Kadar, Nasıl Ödenir?'],
+    ['turk-pasaportu-vizesiz-ulkeler-2026', 'Türk Pasaportuyla 2026\'da Vizesiz Gidilebilecek Ülkeler'],
+    ['schengen-vize-istatistikleri-2025', 'Hangi Ülke Daha Kolay Vize Veriyor? 2025 Schengen İstatistikleri'],
+    ['yilbasi-pazarlari-en-guzel-avrupa-rotalari', 'Yılbaşı Pazarları İçin En Güzel Avrupa Rotaları'],
+    ['kabin-bagaji-olculeri-thy-pegasus-ajet', 'Kabin Bagajı Ölçüleri: THY, Pegasus, AJet Karşılaştırması'],
+    ['ucus-iptal-gecikme-tazminat-haklari', 'Uçuş İptal veya Gecikmesinde Yolcu Hakların Ne?'],
+    ['bagaj-kaybolursa-ne-yapilir', 'Bagajın Kaybolursa Ne Yapmalısın?'],
+    ['en-ucuz-ucak-bileti-ne-zaman-alinir', 'En Ucuz Uçak Bileti Ne Zaman Alınır?'],
+    ['yurtdisinda-kredi-karti-doviz-kullanimi', 'Yurt Dışında Kredi Kartı ve Döviz Kullanımı: Pratik İpuçları'],
+    ['pasaport-yenileme-randevu-ucret-2026', '2026 Pasaport Yenileme: Randevu, Ücretler ve Gerekli Belgeler']
   ];
   (function renderGuideLinks() {
     var h = '';
