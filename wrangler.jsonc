@@ -7,18 +7,22 @@
     "directory": "./",
     "binding": "ASSETS"
   },
-  // Panelden eklenen değişkenler (TP_TOKEN, TP_MARKER) her yayında silinmesin
-  "keep_vars": true,
-  // Travelpayouts Partner ID (gizli değil, buradan yönetiliyor)
-  "vars": {
-    "TP_MARKER": "779049"
+  // Loglama açık: Observability > Events ekranında çalışmaları görebilmek için
+  "observability": {
+    "enabled": true
   },
-  // Her gün 08:00 (Türkiye saati) fiyat hafızasını günceller
+  // Panelden eklenen değişkenler (TP_TOKEN, TG_BOT_TOKEN gibi Secret'lar) her yayında silinmesin
+  "keep_vars": true,
+  // Gizli olmayan değişkenler
+  "vars": {
+    "TP_MARKER": "779049",
+    "TG_CHAT": "@biletavcisinet"
+  },
+  // Günde iki kez çalışır: 08:00 ve 18:00 (Türkiye saati)
   "triggers": {
-    "crons": ["0 5 * * *"]
+    "crons": ["0 5 * * *", "0 15 * * *"]
   },
   // Fiyat hafızası: rota başına son ~45 günün fiyatını saklar.
-  // "id" değerini Cloudflare panelinden oluşturduğun KV namespace'inin ID'siyle değiştir.
   "kv_namespaces": [
     { "binding": "PRICE_HISTORY", "id": "a41b0096821041499d08ee0d1c85143a" }
   ]
