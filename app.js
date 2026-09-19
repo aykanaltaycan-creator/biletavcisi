@@ -49,6 +49,7 @@
   var NAMES = {
     SAW: 'İstanbul', ADB: 'İzmir', VAN: 'Van', DIY: 'Diyarbakır', ERZ: 'Erzurum', KYA: 'Konya', ASR: 'Kayseri',
     SZF: 'Samsun', MLX: 'Malatya', EZS: 'Elazığ', HTY: 'Hatay', GZP: 'Gazipaşa', NAV: 'Kapadokya', DNZ: 'Denizli',
+    VAS: 'Sivas', KFS: 'Kastamonu', RZV: 'Rize-Artvin', COV: 'Çukurova (Adana)',
     EDO: 'Edremit', BAL: 'Batman', MQM: 'Mardin', GNY: 'Şanlıurfa', KSY: 'Kars', ERC: 'Erzincan', MSR: 'Muş',
     DUS: 'Düsseldorf', CGN: 'Köln', STR: 'Stuttgart', HAM: 'Hamburg', HAJ: 'Hannover', NUE: 'Nürnberg',
     BRU: 'Brüksel', GVA: 'Cenevre', BSL: 'Basel', OPO: 'Porto', VCE: 'Venedik', NAP: 'Napoli', BLQ: 'Bologna',
