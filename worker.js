@@ -8,6 +8,13 @@ const MONTH = /^\d{4}-\d{2}$/;
 
 const SITE = 'https://biletavcisi.net';
 
+// Ortaklık linkleri (Travelpayouts Tools sayfasından üretildi). Yeni bir tane
+// eklemek/değiştirmek istersen sadece burayı güncellemen yeterli.
+const AFF = {
+  airalo: 'https://airalo.tpo.mx/Fw1whSRw',
+  booking: '' // henüz eklenmedi
+};
+
 // Fiyat hafızası taranacak kalkış şehirleri ve kaç ay ileriye bakılacağı.
 const DEAL_ORIGINS = ['IST', 'ESB', 'IZM', 'AYT'];
 const DEAL_MONTHS_AHEAD = 2; // bu ay + gelecek 2 ay
@@ -105,6 +112,7 @@ const GUIDE_PAGES = [
 
       <h2>Hangi sağlayıcıya bakmalı?</h2>
       <p>Airalo, Holafly ve Ubigi gibi birkaç tanınmış sağlayıcı var. Aralarındaki fark genelde şu noktalarda toplanıyor: kaç ülkeyi tek pakette kapsadığı (Avrupa turlarında "bölgesel" paketler tek tek ülke almaktan daha avantajlı olabiliyor), veri sınırının sabit mi yoksa "sınırsız ama yavaşlatmalı" mı olduğu, ve destek dilinin Türkçe olup olmadığı. Satın almadan önce güncel fiyat ve kapsama alanını sağlayıcının kendi sitesinden kontrol etmek en sağlıklısı, çünkü paketler sık güncelleniyor.</p>
+      <p><a class="btn" href="${AFF.airalo}" target="_blank" rel="noopener nofollow sponsored">Airalo'da ülkeler ve paketlere bak</a></p>
 
       <h2>Pratik bir ipucu</h2>
       <p>WhatsApp, Telegram gibi uygulamalar üzerinden mesajlaşma ve arama internet üzerinden çalıştığı için, çoğu seyahatte yerel bir telefon numarasına ihtiyaç duyulmuyor — sadece veri (data) paketi yeterli oluyor. Bu da eSIM'i daha da pratik kılıyor.</p>
