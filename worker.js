@@ -126,7 +126,7 @@ const GUIDE_PAGES = [
       <p>Uçak biletini bulduktan sonra sırada konaklama var. Doğru yerde, doğru fiyata kalmak birkaç basit alışkanlıkla kolaylaşıyor.</p>
 
       <h2>Tek tek otel sitesine bakma, karşılaştır</h2>
-      <p>Her otelin kendi sitesine tek tek girip fiyat karşılaştırmak yerine, birden fazla kaynağı aynı anda gösteren karşılaştırma siteleri zaman kazandırır. Bizim de kullandığımız Aviasales'in kardeş servisi Hotellook, 250 binden fazla oteli tek ekranda karşılaştırıyor.</p>
+      <p>Her otelin kendi sitesine tek tek girip fiyat karşılaştırmak yerine, birden fazla kaynağı aynı anda gösteren karşılaştırma siteleri zaman kazandırır.</p>
 
       <h2>Otel mi, hostel mi?</h2>
       <p>Hostel'ler genelde paylaşımlı oda seçeneğiyle bütçe seyahatinde en ucuz seçenek; ayrıca ortak mutfak ve sosyal alanlar sayesinde tek başına seyahat edenler için insan tanımak da kolaylaşıyor. Mahremiyet önemliyse hostel'lerin "özel oda" seçenekleri de genelde standart bir otel odasından daha ucuza geliyor.</p>
@@ -142,6 +142,303 @@ const GUIDE_PAGES = [
 
       <h2>Vize başvurusuyla bağlantısı</h2>
       <p><a href="/#vize">Vize rehberimizde</a> de belirttiğimiz gibi, birçok ülke başvuru sırasında bir konaklama rezervasyon belgesi istiyor. Bu yüzden vize başvurusu öncesinde ücretsiz iptal edilebilir bir rezervasyon yapmak, hem belgeyi hazırlamış olmak hem de plan değişirse zarar etmemek için işe yarıyor.</p>
+    `
+  },
+  {
+    slug: 'yurt-disi-cikis-harci-2026',
+    title: '2026 Yurt Dışı Çıkış Harcı Ne Kadar, Nasıl Ödenir?',
+    desc: 'Türkiye\'den her çıkışta ödenen harcın 2026 tutarı, ödeme yöntemleri, muafiyetler ve iade süreci.',
+    bodyHtml: `
+      <p>Türkiye Cumhuriyeti pasaportuyla yurt dışına çıkan her vatandaş, çıkış başına bir harç ödüyor. Adı "yurt dışına çıkış harcı" ve her yıl yeniden değerleme oranında güncelleniyor.</p>
+
+      <h2>2026'da tutar ne kadar?</h2>
+      <p><strong>1 Ocak 2026'dan itibaren yurt dışı çıkış harcı kişi başı 1.250 TL.</strong> Bir önceki yıl (2025) bu tutar 710 TL idi; yıllık yeniden değerleme oranına göre artırıldı. Harç, <strong>her çıkışta ayrı ayrı</strong> alınıyor — çok girişli bir vizen olsa bile, Türkiye'den her çıkışında yeniden ödüyorsun.</p>
+
+      <h2>Nasıl ödenir?</h2>
+      <p>1 Ocak 2025'ten itibaren basılı harç pulu uygulaması tamamen kalktı, sistem artık dijital. Ödeme şu kanallardan yapılabiliyor:</p>
+      <ul>
+        <li>Bankaların mobil uygulaması veya internet şubesi</li>
+        <li>Gelir İdaresi Başkanlığı'nın online sistemleri</li>
+        <li>PTT şubeleri</li>
+        <li>Havalimanındaki banka şubeleri veya kiosklar (son ana kalırsa)</li>
+      </ul>
+      <p>Ödeme, sistem tarafından çıkış sırasında otomatik kontrol ediliyor; yanında fiziki bir dekont taşımak zorunlu değil, ama olası bir aksaklığa karşı ödeme ekran görüntüsünü telefonda saklamakta fayda var.</p>
+
+      <h2>Kimler muaf?</h2>
+      <ul>
+        <li>7 yaşını doldurmamış çocuklar</li>
+        <li>Sadece T.C. kimlik kartıyla KKTC'ye geçenler (pasaportla geçilirse harç ödeniyor)</li>
+        <li>Uluslararası taşımacılıkta görevli personel (kara/hava/deniz)</li>
+        <li>Yurt dışında daimi olarak öğrenci kaydı bulunanlar (belgeyle)</li>
+      </ul>
+      <p>Bunların dışında genel bir muafiyet yok — eğitim, iş ya da tatil amaçlı her çıkışta harç ödeniyor.</p>
+
+      <h2>Seyahat gerçekleşmezse ne olur?</h2>
+      <p>Harcı ödedikten sonra seyahat iptal olursa, dekont ve kimlik bilgilerinle ilgili kuruma iade başvurusu yapılabiliyor. Prosedür zaman zaman değişebildiği için başvuru öncesi güncel bilgiyi Gelir İdaresi Başkanlığı'nın sitesinden teyit etmek en sağlıklısı.</p>
+
+      <p class="note">Bu tutar her yıl güncellenebildiği için, seyahatinden hemen önce güncel rakamı bir kez daha kontrol etmen iyi olur.</p>
+    `
+  },
+  {
+    slug: 'turk-pasaportu-vizesiz-ulkeler-2026',
+    title: 'Türk Pasaportuyla 2026\'da Vizesiz Gidilebilecek Ülkeler',
+    desc: 'Bordo pasaportla vize almadan ya da kapıda vize ile girilebilen ülkeler, bölge bölge örneklerle.',
+    bodyHtml: `
+      <p>2026 itibarıyla Türk pasaportu (sıradan, "bordo" pasaport) ile vizesiz ya da kapıda vize/e-vize gibi kolaylaştırılmış yollarla girilebilen ülke sayısı yaklaşık <strong>97</strong>. Bu rakam yıldan yıla küçük değişiklikler gösterebiliyor.</p>
+
+      <p class="note">Not: Kamu görevlilerine verilen yeşil (hususi) pasaportun ayrıcalıkları daha geniş. Bu yazı, çoğu okurun sahip olduğu sıradan bordo pasaport için geçerli.</p>
+
+      <h2>Vizesiz, kapıda vize (VOA) ve e-Vize farkı</h2>
+      <p><strong>Vizesiz:</strong> pasaportla doğrudan giriş yapılır, önceden hiçbir işlem gerekmez. <strong>Kapıda vize (VOA):</strong> sınıra varınca, genelde nakit ya da kartla küçük bir ücret ödeyip vize alınır. <strong>e-Vize:</strong> seyahatten önce internetten form doldurup online ödeme yapılır, belge genelde e-postayla gelir. Üçü de konsolosluğa gidip randevu almaktan çok daha pratik.</p>
+
+      <h2>Bölge bölge örnekler</h2>
+      <p><strong>Balkanlar:</strong> Arnavutluk, Bosna Hersek, Kuzey Makedonya, Sırbistan, Karadağ ve Kosova — genelde 90 güne kadar vizesiz.</p>
+      <p><strong>Kafkasya:</strong> Gürcistan tamamen vizesiz; Azerbaycan'a bazı sınır kapılarından yalnızca kimlikle bile geçilebiliyor.</p>
+      <p><strong>Güney Amerika:</strong> Arjantin, Brezilya, Şili, Kolombiya, Peru, Uruguay ve Ekvador gibi ülkeler turistik ziyaretlerde genelde 90 güne kadar vize istemiyor.</p>
+      <p><strong>Asya:</strong> Japonya, Güney Kore, Katar, Malezya, Singapur, Tayland ve Ürdün vizesiz girilebilen ülkeler arasında; Kırgızistan 90 güne kadar vize muafiyeti tanıyor.</p>
+      <p><strong>Kuzey Afrika ve Ortadoğu:</strong> Fas ve Tunus vizesiz; Lübnan da Türk vatandaşlarına kapılarını açık tutuyor.</p>
+
+      <h2>Sınırda hangi belgeler istenebilir?</h2>
+      <ul>
+        <li>Girişten itibaren en az 6 ay geçerli pasaport</li>
+        <li>Dönüş ya da ileri tarihli uçak bileti</li>
+        <li>Konaklama kanıtı (otel rezervasyonu)</li>
+        <li>Yeterli maddi imkânı gösteren bir belge (bazı ülkelerde)</li>
+      </ul>
+
+      <h2>Bir uyarı</h2>
+      <p>Bu tür listeler ülkeler arasındaki anlaşmalara bağlı olduğu için zaman zaman değişebiliyor. Uçak biletini almadan önce, gideceğin ülkenin Türkiye'deki büyükelçiliğinin veya kendi dışişleri sitesinin güncel bilgisini mutlaka kontrol et — burada verdiğimiz bilgi genel bir çerçeve sunar, kesin kural yerine geçmez.</p>
+
+      <p>Schengen bölgesine gidecekler için ayrıca <a href="/#vize">vize rehberimize</a> ve <a href="/rehber/yurt-disi-cikis-harci-2026">çıkış harcı yazımıza</a> göz atabilirsin.</p>
+    `
+  },
+  {
+    slug: 'schengen-vize-istatistikleri-2025',
+    title: 'Hangi Ülke Daha Kolay Vize Veriyor? 2025 Schengen İstatistikleri',
+    desc: 'Avrupa Komisyonu\'nun açıkladığı 2025 verilerine göre Türk vatandaşlarının Schengen vize ret oranları, ülke ülke.',
+    bodyHtml: `
+      <p>Avrupa Komisyonu, Schengen ülkelerinin verdiği ve reddettiği kısa süreli vizelere ait istatistikleri her yıl yayımlıyor. 28 Mayıs 2026'da açıklanan en güncel veriler, 2025 yılını kapsıyor.</p>
+
+      <h2>Genel tablo</h2>
+      <p>2025'te Türkiye'den yapılan Schengen vizesi başvuru sayısı <strong>1.268.376</strong>'ya ulaştı — bir önceki yıla göre yaklaşık %8'lik bir artış. Bunların <strong>1.072.054'ü onaylandı</strong>, <strong>183.196'sı reddedildi</strong>. Yani genel ret oranı <strong>%14,6</strong> oldu (2024'te bu oran %14,5 civarındaydı, neredeyse değişmedi). Türkiye, Çin'in ardından dünyada en çok Schengen vizesi başvurusu yapılan ikinci ülke olmayı sürdürdü.</p>
+
+      <h2>Ülkeye göre ret oranları</h2>
+      <p>En çok başvuru yapılan ülke <strong>Yunanistan</strong> oldu (310.920 başvuru) ve ret oranı <strong>%10,7</strong> ile genel ortalamanın altında kaldı. İkinci sırada en çok başvurulan ülke olan <strong>Almanya</strong>'da (217.627 başvuru) ise ret oranı <strong>%21,1</strong> ile yüksek hacimli ülkeler arasında en dikkat çekici rakam oldu.</p>
+      <p>Diğer bazı ülkelerdeki ret oranları: <strong>Hollanda %9</strong>, <strong>Bulgaristan %10,1</strong>, <strong>İspanya ve Romanya %7,4</strong>. En düşük ret oranı <strong>%3,5</strong> ile <strong>Portekiz</strong>'de görüldü — ancak bu ülkeye yapılan başvuru sayısı (yaklaşık 3.921) diğerlerine göre çok düşük, bu yüzden oranı temkinli yorumlamak gerekiyor. Genel olarak en yüksek ret oranına sahip ülke ise yaklaşık <strong>%34,8</strong> ile <strong>Malta</strong> oldu.</p>
+
+      <h2>Bu rakamlar ne anlama geliyor?</h2>
+      <p>Düşük ret oranı olan bir ülke "kesin vize alırım" garantisi vermiyor — başvurunun gücü (gelir durumu, önceki seyahat geçmişi, davet mektubu gibi belgeler) istatistiksel orandan çok daha belirleyici. Ayrıca Schengen kuralları gereği, başvurunu <strong>asıl gideceğin ülkeye</strong> yapman gerekiyor; sadece ret oranı düşük diye farklı bir ülkeye başvurmak kurallara aykırı ve tek başına reddedilme sebebi olabilir.</p>
+
+      <p>Hangi ülke için hangi merkeze başvurulduğunu ve gerekli belgeleri <a href="/#vize">vize rehberimizde</a> bulabilirsin.</p>
+    `
+  },
+  {
+    slug: 'yilbasi-pazarlari-en-guzel-avrupa-rotalari',
+    title: 'Yılbaşı Pazarları İçin En Güzel Avrupa Rotaları',
+    desc: 'Kasım-Aralık ayında Avrupa\'nın en atmosferik yılbaşı pazarlarına sahip şehirlerini ve pratik ipuçlarını derledik.',
+    bodyHtml: `
+      <p>Avrupa'da yılbaşı pazarları genelde Kasım sonunda açılıyor, bazıları Aralık sonuna kadar sürüyor. Sıcak şarap (glühwein), el yapımı hediyelik eşya ve ışıklarla süslenmiş meydanlar, kış tatilinin klasik bir parçası haline geldi.</p>
+
+      <h2>Viyana</h2>
+      <p>Rathausplatz'daki (Belediye Sarayı Meydanı) pazar, Avrupa'nın en görkemli yılbaşı pazarlarından biri. Schönbrunn Sarayı'nın bahçesindeki daha sakin pazar da alternatif bir seçenek. <a href="/ucuz-ucak-bileti/istanbul-viyana">İstanbul-Viyana uçuşlarına buradan bakabilirsin</a>.</p>
+
+      <h2>Prag</h2>
+      <p>Eski Şehir Meydanı'ndaki pazar, ortaçağ mimarisiyle çevrili olması sayesinde çok fotogenik bir atmosfer sunuyor. <a href="/ucuz-ucak-bileti/istanbul-prag">İstanbul-Prag uçuşlarına buradan bakabilirsin</a>.</p>
+
+      <h2>Budapeşte</h2>
+      <p>Vörösmarty Meydanı'ndaki pazar, özellikle yöresel lezzetler (kürtőskalács gibi) açısından öne çıkıyor. <a href="/ucuz-ucak-bileti/istanbul-budapeste">İstanbul-Budapeşte uçuşlarına buradan bakabilirsin</a>.</p>
+
+      <h2>Nürnberg</h2>
+      <p>Almanya'nın en eski ve en ünlü yılbaşı pazarlarından biri (Christkindlesmarkt), her yıl yoğun ilgi görüyor.</p>
+
+      <h2>Strazburg</h2>
+      <p>Kendini "Noel'in Başkenti" olarak tanımlayan şehir, ahşap kirişli tarihi evleriyle masalsı bir hava taşıyor.</p>
+
+      <h2>Köln</h2>
+      <p>Katedralin çevresinde birden fazla pazar aynı anda kuruluyor, tek gezide birkaç farklı atmosfer deneyimlenebiliyor.</p>
+
+      <h2>Pratik ipuçları</h2>
+      <ul>
+        <li>Pazarların çoğu Aralık'ın son haftasında (bazen 23-26 Aralık civarı) kapanıyor, kesin tarihleri gitmeden önce kontrol et.</li>
+        <li>Hafta sonları ve akşam saatleri en kalabalık zamanlar; hafta içi gündüz saatleri daha sakin.</li>
+        <li>Bu şehirlerin hepsi Schengen bölgesinde, vize süreci ve gerekli belgeler için <a href="/#vize">vize rehberimize</a> bakabilirsin.</li>
+        <li>Kalın giyinmeyi ihmal etme — açık hava pazarlarında akşamları hava hızla soğuyor.</li>
+      </ul>
+    `
+  },
+  {
+    slug: 'kabin-bagaji-olculeri-thy-pegasus-ajet',
+    title: 'Kabin Bagajı Ölçüleri: THY, Pegasus, AJet Karşılaştırması',
+    desc: 'Türk havayollarının kabin bagajı boyut ve ağırlık kuralları, koltuk altı çantasıyla farkı.',
+    bodyHtml: `
+      <p>Uçağa binmeden önce çoğu kişinin son anda merak ettiği soru: "bu çanta kabin bagajı sınırına giriyor mu?" İşte üç büyük Türk havayolunun güncel kuralları.</p>
+
+      <h2>Standart kabin bagajı</h2>
+      <p>Bileti kabin bagajı hakkı içeren bir pakette aldıysan:</p>
+      <ul>
+        <li><strong>THY ve AJet:</strong> 55 x 40 x 23 cm, 8 kg</li>
+        <li><strong>Pegasus:</strong> 55 x 40 x 20 cm, 8 kg (bazı kaynaklarda 23 cm de geçiyor; kesin ölçüyü bilet alırken kendi hesabından teyit etmekte fayda var)</li>
+      </ul>
+
+      <h2>Koltuk altı çantası (kişisel eşya)</h2>
+      <p>En ucuz bilet paketlerinde (örneğin Pegasus'un "Light" paketi) sadece koltuk altına sığan küçük bir çanta hakkı oluyor: <strong>40 x 30 x 15 cm, 3 kg</strong>. Bir sırt çantası veya dizüstü bilgisayar çantası bu ölçüye uyduğu sürece kabul ediliyor.</p>
+
+      <h2>En ucuz bilette bagaj hakkı yok mu demek?</h2>
+      <p>Evet, tam olarak öyle. Havayollarının "en ucuz" görünen fiyatları genelde sadece koltuk altı çantasını kapsıyor. Yanında bavul götürecekseniz bilet alırken bir üst pakete geçmen ya da ayrıca kabin/kayıtlı bagaj hakkı satın alman gerekiyor — bunu havalimanında son anda yapmak, önceden internetten almaktan neredeyse her zaman daha pahalıya geliyor.</p>
+
+      <h2>Kayıtlı (uçak altı) bagaj</h2>
+      <p>Kayıtlı bagajda tek bir parça, kaç kg hakkın olursa olsun <strong>32 kg</strong>'ı geçemez; bu havacılık güvenlik kuralı tüm havayolları için geçerli. Ağırlığın fazlası varsa birden fazla parçaya bölünmesi gerekiyor.</p>
+
+      <p class="note">Bu bilgiler genel bir özet niteliğinde; bilet alırken satın aldığın paketin tam bagaj hakkını mutlaka kontrol et, çünkü kurallar paket ve rotaya göre değişebiliyor.</p>
+    `
+  },
+  {
+    slug: 'ucus-iptal-gecikme-tazminat-haklari',
+    title: 'Uçuş İptal veya Gecikmesinde Yolcu Hakların Ne?',
+    desc: 'Avrupa\'nın EC261 yönetmeliğine göre hangi durumlarda 250-600 € tazminat alabilirsin.',
+    bodyHtml: `
+      <p>Avrupa'da uçuş yapan yolcular, dünyanın en kapsamlı yolcu haklarından birine sahip: <strong>EC261</strong> (261/2004 sayılı AB Yönetmeliği). Bu hak Türkiye'den değil ama Avrupa'dan dönüş uçuşların için önemli olabilir.</p>
+
+      <h2>Hangi uçuşlar kapsamda?</h2>
+      <p>EC261, bir AB/AEA havalimanından kalkan <strong>her</strong> uçuşu (havayolu fark etmeksizin) ve AB dışından AB'ye inen, AB lisanslı bir havayolunun uçtuğu uçuşları kapsıyor. İzlanda, Norveç ve İsviçre de bu kapsamda. Pratikte bu, örneğin <strong>Viyana'dan İstanbul'a dönüş uçuşunun</strong> kapsamda olduğu, ama İstanbul'dan Viyana'ya gidiş uçuşunun (Türk havayolu kullanıyorsan) kapsam dışı kalabileceği anlamına geliyor.</p>
+
+      <h2>Ne kadar tazminat alınır?</h2>
+      <p>Tazminat, bilet fiyatından bağımsız, sadece <strong>mesafeye</strong> göre belirleniyor:</p>
+      <ul>
+        <li>1.500 km'ye kadar (örn. İstanbul–Atina): <strong>250 €</strong></li>
+        <li>1.500–3.500 km arası (örn. İstanbul–Londra): <strong>400 €</strong></li>
+        <li>3.500 km üzeri (örn. İstanbul–New York): <strong>600 €</strong></li>
+      </ul>
+      <p>Bu tazminat, varışta <strong>en az 3 saat</strong> gecikme yaşandığında ya da uçuş kalkıştan 14 günden az bir süre önce iptal edildiğinde geçerli.</p>
+
+      <h2>Her zaman alınır mı?</h2>
+      <p>Hayır. Hava koşulları, grev veya güvenlik riski gibi "olağanüstü haller" varsa havayolu tazminattan muaf olabiliyor. Ancak teknik arıza veya personel eksikliği gibi havayolunun kendi organizasyonel sorunları bu kapsamda sayılmıyor — yani bu durumlarda tazminat hakkın devam ediyor.</p>
+
+      <h2>Nasıl başvurulur?</h2>
+      <p>İlk adım doğrudan havayolunun kendi sitesindeki tazminat başvuru formu. Havayolu yanıt vermez ya da reddederse, tazminatın bir kısmını komisyon olarak alan uzman şirketler (AirHelp gibi) üzerinden de başvurabilirsin — bu şirketler süreci senin yerine takip ediyor.</p>
+    `
+  },
+  {
+    slug: 'bagaj-kaybolursa-ne-yapilir',
+    title: 'Bagajın Kaybolursa Ne Yapmalısın?',
+    desc: 'Havalimanında ilk yapman gereken adım, tazminat limitleri ve başvuru süreleri.',
+    bodyHtml: `
+      <p>Bagajın çıkmadıysa panik yapmadan önce atman gereken tek bir kritik adım var, gerisi onun üzerine kurulu.</p>
+
+      <h2>En önemli adım: PIR raporu</h2>
+      <p>Gümrükten geçmeden <strong>önce</strong>, havayolunun bagaj kayıp masasına giderek bir <strong>PIR (Property Irregularity Report)</strong> düzenlet. Bu belge, sorunun bagaj hâlâ havayolunun elindeyken oluştuğunun resmi kanıtı. Bu belge olmadan sonradan yapılan neredeyse hiçbir tazminat başvurusu kabul edilmiyor.</p>
+
+      <h2>Ne kadar süre "kayıp" sayılır?</h2>
+      <p>Uluslararası uçuşlarda geçerli Montreal Sözleşmesi'ne göre bagaj, uçuştan itibaren <strong>21 gün</strong> içinde bulunup teslim edilmezse resmen "kayıp" sayılıyor (havayolu daha erken kaybettiğini kabul ederse o tarih geçerli oluyor).</p>
+
+      <h2>Ne kadar tazminat alınabilir?</h2>
+      <p>Montreal Sözleşmesi, kayıp, hasarlı veya gecikmeli bagaj için sorumluluğu <strong>1.519 SDR</strong> (Aralık 2024 güncellemesiyle yaklaşık <strong>1.920 €</strong>) ile sınırlıyor. Bu limit, çanta başına değil <strong>yolcu başına</strong> geçerli. Yani bagajının veya içindekilerin değeri bu sınırı aşıyorsa, aradaki farkı havayolundan tazmin ettiremezsin — değerli eşyalar için ayrıca seyahat sigortası düşünülebilir.</p>
+
+      <h2>Başvuru süreleri</h2>
+      <ul>
+        <li><strong>Hasarlı bagaj:</strong> teslim alındıktan sonra en geç 7 gün içinde itiraz edilmeli.</li>
+        <li><strong>Gecikmeli bagaj:</strong> teslim edildikten sonra en geç 21 gün içinde başvuru yapılmalı.</li>
+      </ul>
+
+      <h2>Beklerken ne yapmalı?</h2>
+      <p>Bagaj gecikmesi durumunda, havayolu genelde diş fırçası, iç çamaşırı gibi acil ihtiyaçların makul maliyetini karşılıyor — bu masrafların fişlerini sakla. Havayolu genelde geçici ihtiyaçlar için önceden nakit vermez, harcamayı sen yapıp fişle geri talep edersin.</p>
+
+      <p class="note">Bu tutarlar Özel Çekme Hakkı (SDR) cinsinden belirlenip düzenli olarak güncelleniyor; başvuru sırasında güncel euro karşılığını havayolunun veya ICAO'nun sitesinden teyit etmek en sağlıklısı.</p>
+    `
+  },
+  {
+    slug: 'en-ucuz-ucak-bileti-ne-zaman-alinir',
+    title: 'En Ucuz Uçak Bileti Ne Zaman Alınır?',
+    desc: '"Salı günü al" gibi efsanelerin ötesinde, gerçekten işe yarayan bilet alma stratejileri.',
+    bodyHtml: `
+      <p>"Bileti falanca gün al, en ucuzu o gün çıkar" gibi tavsiyeler internette çok dolaşıyor, ama çoğu havayolu fiyatlandırma sistemlerinin karmaşıklığı düşünüldüğünde güvenilir bir dayanağı yok. Daha sağlam birkaç prensip var.</p>
+
+      <h2>Asıl belirleyici: alım zamanlaması</h2>
+      <p>"Hangi gün alınır"dan çok, "kaç gün/hafta önce alınır" fiyatı daha çok etkiliyor. Genel bir çerçeve:</p>
+      <ul>
+        <li><strong>Yurt içi uçuşlar:</strong> seyahatten birkaç hafta ila ~2 ay önce</li>
+        <li><strong>Avrupa'ya kısa/orta mesafe:</strong> 2-4 ay önce</li>
+        <li><strong>Yaz sezonu, yılbaşı gibi yoğun dönem uçuşları:</strong> 4-6 ay, hatta daha erken</li>
+      </ul>
+      <p>Çok erken almak da her zaman en ucuzu garanti etmiyor — havayolları fiyatları sezona yaklaştıkça birkaç kez günceller, bazen düşürür.</p>
+
+      <h2>Hangi gün uçmak daha ucuz?</h2>
+      <p>"Hangi gün almalı" sorusundan farklı olarak, "hangi gün uçmalı" sorusunun biraz daha güçlü bir dayanağı var: iş seyahati talebinin düşük olduğu <strong>salı, çarşamba</strong> gibi hafta ortası günler, cuma akşamı veya pazar gibi yoğun günlere kıyasla genelde biraz daha ucuza geliyor. Yine de bu bir garanti değil, rotaya göre değişebilir.</p>
+
+      <h2>Tek yön mü, gidiş-dönüş mü?</h2>
+      <p>Bazı düşük maliyetli havayollarında iki ayrı tek yön bilet, bir gidiş-dönüş biletten daha ucuza gelebiliyor; bazı geleneksel havayollarında ise tam tersi. Kesin bir kural yok, her ikisini de karşılaştırmak gerekiyor.</p>
+
+      <h2>Tahmin yerine takip et</h2>
+      <p>Tek seferlik bir "kural" aramak yerine, ilgilendiğin rotanın fiyatının zaman içinde nasıl değiştiğini görmek çok daha güvenilir. <a href="/#ara">Fiyat takvimimizde</a> bir ay boyunca günlük fiyatları karşılaştırabilir, <a href="/#firsatlar">Fırsatlar</a> bölümünden de normalin belirgin altına düşen anları yakalayabilirsin.</p>
+    `
+  },
+  {
+    slug: 'yurtdisinda-kredi-karti-doviz-kullanimi',
+    title: 'Yurt Dışında Kredi Kartı ve Döviz Kullanımı: Pratik İpuçları',
+    desc: 'Havalimanında döviz bozdurma tuzağı, kartla ödemede "kendi para biriminle mi öde" sorusu ve daha fazlası.',
+    bodyHtml: `
+      <p>Yurt dışına çıkmadan önce birkaç basit alışkanlık, tatil boyunca gereksiz komisyon ödemeni engelliyor.</p>
+
+      <h2>Havalimanında döviz bozdurma tuzağı</h2>
+      <p>Havalimanındaki döviz bürolarının kurları genelde şehir merkezindeki bankalara veya ATM'lere göre belirgin şekilde daha kötü. Mümkünse havalimanında sadece ilk birkaç saatlik ihtiyacın kadar (taksi, kahve gibi) küçük bir miktar bozdurup, geri kalanını şehirde ya da ATM'den çekmek daha avantajlı oluyor.</p>
+
+      <h2>"Kendi para biriminle mi ödeyeyim?" sorusuna hayır de</h2>
+      <p>Yurt dışında POS cihazında kartla öderken bazen cihaz "TL olarak mı, yoksa yerel para birimiyle mi ödemek istersin?" diye soruyor. Bu, <strong>Dinamik Kur Dönüşümü (DCC)</strong> denen bir uygulama ve neredeyse her zaman senin aleyhine işleyen bir kur kullanıyor. Doğru seçim, ne sorulursa sorulsun her zaman <strong>yerel para birimiyle</strong> ödemeyi seçmek — kartını çıkaran banka, kendi güncel kurunu (genelde daha iyi) uygular.</p>
+
+      <h2>Kartında yurt dışı işlem ücreti var mı?</h2>
+      <p>Bazı kartlar yurt dışı alışverişlerde ekstra bir komisyon kesiyor. Seyahat öncesi bankandan ya da kart sözleşmenden bu ücretin olup olmadığını kontrol etmek, sürpriz bir ekstra masrafı önlüyor.</p>
+
+      <h2>Yedek kart bulundur</h2>
+      <p>Bir kartın yurt dışında bloke olması ya da kaybolması ihtimaline karşı, farklı bir bankadan ikinci bir kartı ayrı bir yerde taşımak makul bir önlem.</p>
+
+      <h2>Nakit tamamen gereksiz değil</h2>
+      <p>Bazı ülkelerde küçük esnaf, bahşiş veya toplu taşıma hâlâ nakit istiyor olabilir. Kartla her yerde ödeme yapabileceğini varsaymadan önce, gideceğin ülkede nakit kullanımının ne kadar yaygın olduğunu kısaca araştırmak faydalı.</p>
+    `
+  },
+  {
+    slug: 'pasaport-yenileme-randevu-ucret-2026',
+    title: '2026 Pasaport Yenileme: Randevu, Ücretler ve Gerekli Belgeler',
+    desc: 'Pasaport yenileme randevusu nasıl alınır, 2026 harç ve defter bedelleri ne kadar, süre ne kadar sürer?',
+    bodyHtml: `
+      <p>Pasaportun süresi dolmadan (özellikle Schengen başvurusu düşünüyorsan en az 6 ay geçerlilik payıyla) yenilemek, seyahat planının aksamaması için önemli bir adım.</p>
+
+      <h2>Randevu nasıl alınır?</h2>
+      <p>Pasaport başvurusu randevusuz yapılamıyor. Randevu şu kanallardan alınabiliyor:</p>
+      <ul>
+        <li><strong>randevu.nvi.gov.tr</strong> üzerinden online</li>
+        <li><strong>e-Devlet</strong> üzerinden NVİ hizmetleri bölümü</li>
+        <li><strong>ALO 199</strong> Vatandaş Etkileşim Merkezi'ni arayarak</li>
+      </ul>
+      <p>İkamet ettiğin şehirden başvurmak zorunda değilsin; Türkiye genelinde herhangi bir nüfus müdürlüğünü seçebilirsin.</p>
+
+      <h2>2026 ücretleri ne kadar?</h2>
+      <table style="width:100%;border-collapse:collapse;margin:12px 0">
+        <tr style="border-bottom:1px solid var(--line)"><th style="text-align:left;padding:6px 0">Süre</th><th style="text-align:right;padding:6px 0">Toplam ücret</th></tr>
+        <tr style="border-bottom:1px solid var(--line)"><td style="padding:6px 0">6 ay</td><td style="text-align:right">4.157,50 TL</td></tr>
+        <tr style="border-bottom:1px solid var(--line)"><td style="padding:6px 0">1 yıl</td><td style="text-align:right">5.454,00 TL</td></tr>
+        <tr style="border-bottom:1px solid var(--line)"><td style="padding:6px 0">2 yıl</td><td style="text-align:right">8.049,50 TL</td></tr>
+        <tr style="border-bottom:1px solid var(--line)"><td style="padding:6px 0">3 yıl</td><td style="text-align:right">10.867,00 TL</td></tr>
+        <tr><td style="padding:6px 0">4-10 yıl</td><td style="text-align:right">14.761,40 TL</td></tr>
+      </table>
+      <p><strong>25 yaşını doldurmamış öğrenciler harç bedelinden muaf</strong>, sadece 1.351 TL defter bedeli ödüyor.</p>
+
+      <h2>Gerekli belgeler</h2>
+      <ul>
+        <li>T.C. kimlik kartı</li>
+        <li>Son 6 ay içinde çekilmiş biyometrik fotoğraf</li>
+        <li>Harç ve defter bedeli ödeme dekontu (randevudan önce ödenmiş olmalı)</li>
+        <li>20 yaş üstü erkekler için askerlik durum belgesi</li>
+        <li>18 yaşından küçükler için veli muvafakatnamesi</li>
+        <li>Yenileme ise mevcut pasaport</li>
+      </ul>
+
+      <h2>Ne kadar sürede çıkar?</h2>
+      <p>Normal başvurularda pasaport genelde <strong>1-2 hafta</strong> içinde hazır oluyor. Acil ihtiyaç varsa, ek ücret karşılığında <strong>1-3 iş günü</strong>ne düşen acil pasaport başvurusu da mümkün (genelde daha kısa süreli, 6 ay veya 1 yıllık olarak veriliyor).</p>
+
+      <h2>Pasaport kaybolur veya çalınırsa?</h2>
+      <p>Önce en yakın karakola giderek tutanak tutturman gerekiyor — bu, eski pasaportun kötüye kullanılmasını önlemek için sisteme işleniyor. Kayıp pasaport için yenileme ücreti, standart başvuru ücretiyle aynı; ekstra bir "kayıp cezası" uygulanmıyor.</p>
+
+      <p class="note">Ücretler her yıl yeniden değerleme oranında güncelleniyor. Başvurudan hemen önce randevu.nvi.gov.tr üzerinden güncel tutarı bir kez daha kontrol etmen iyi olur.</p>
     `
   }
 ];
