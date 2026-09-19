@@ -24,7 +24,7 @@
     ['NCE', 'Nis', 'Avrupa'], ['LYS', 'Lyon', 'Avrupa'], ['MRS', 'Marsilya', 'Avrupa'], ['SKG', 'Selanik', 'Avrupa'],
     ['SKP', 'Üsküp', 'Avrupa'], ['TIA', 'Tiran', 'Avrupa'], ['PRN', 'Priştine', 'Avrupa'], ['KIV', 'Kişinev', 'Avrupa'],
     ['MLA', 'Malta', 'Avrupa'], ['SPU', 'Split', 'Avrupa'], ['DBV', 'Dubrovnik', 'Avrupa'], ['PMI', 'Mallorca', 'Avrupa'],
-    ['AGP', 'Malaga', 'Avrupa'], ['VLC', 'Valensiya', 'Avrupa'],
+    ['AGP', 'Malaga', 'Avrupa'], ['VLC', 'Valensiya', 'Avrupa'], ['OSL', 'Oslo', 'Avrupa'],
     ['TBS', 'Tiflis', 'Kafkasya'], ['BAK', 'Bakü', 'Kafkasya'], ['EVN', 'Erivan', 'Kafkasya'],
     ['DXB', 'Dubai', 'Ortadoğu'], ['DOH', 'Doha', 'Ortadoğu'], ['AUH', 'Abu Dabi', 'Ortadoğu'], ['AMM', 'Amman', 'Ortadoğu'],
     ['BEY', 'Beyrut', 'Ortadoğu'], ['JED', 'Cidde', 'Ortadoğu'], ['RUH', 'Riyad', 'Ortadoğu'], ['KWI', 'Kuveyt', 'Ortadoğu'],
