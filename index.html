@@ -39,13 +39,16 @@
 
     <form class="sign" id="searchForm" aria-label="Uçuş arama">
       <div class="sign-grid">
-        <div class="field">
-          <label for="from">Nereden</label>
-          <select id="from"></select>
-        </div>
-        <div class="field">
-          <label for="to">Nereye</label>
-          <select id="to"></select>
+        <div class="swap-wrap">
+          <div class="field">
+            <label for="from">Nereden</label>
+            <select id="from"></select>
+          </div>
+          <button type="button" id="swapBtn" class="swap-btn" aria-label="Nereden ve nereyi değiştir" title="Nereden ve nereyi değiştir">⇄</button>
+          <div class="field">
+            <label for="to">Nereye</label>
+            <select id="to"></select>
+          </div>
         </div>
         <div class="field field-month">
           <label for="month">Hangi ay</label>
