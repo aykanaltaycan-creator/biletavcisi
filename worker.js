@@ -17,7 +17,7 @@ const AFF = {
 
 // Fiyat hafızası taranacak kalkış şehirleri ve kaç ay ileriye bakılacağı.
 const DEAL_ORIGINS = ['IST', 'ESB', 'IZM', 'AYT'];
-const DEAL_MONTHS_AHEAD = 2; // bu ay + gelecek 2 ay
+const DEAL_MONTHS_AHEAD = 1; // bu ay + gelecek ay (istek sayısını düşük tutmak için)
 const HISTORY_LEN = 45;      // her rota için saklanan gün sayısı
 const MIN_HISTORY_FOR_DEAL = 5; // karşılaştırma yapılabilmesi için gereken en az gün sayısı
 const ALERT_THRESHOLD_PCT = 25; // Telegram'a "fırsat" olarak düşecek minimum indirim yüzdesi
@@ -697,14 +697,15 @@ async function deals(q, env) {
   }));
 
   // Fiyat hafızamız varsa (KV), her teklifin gerçekten "normalden ne kadar ucuz"
-  // olduğunu kendi geçmiş verimizle hesaplayıp ekliyoruz.
+  // olduğunu kendi geçmiş verimizle hesaplayıp ekliyoruz. Tek bir okuma yeterli:
+  // tüm şehrin hafızası zaten tek pakette (mem:<ORIGIN>).
   if (env.PRICE_HISTORY) {
-    list = await Promise.all(list.map(async x => {
-      const hist = await readHistory(env, o, x.destination);
-      const base = baseline(hist);
+    const mem = await readOriginMem(env, o); // 1 KV okuma, kaç teklif olursa olsun
+    list = list.map(x => {
+      const base = baseline(mem.hist[x.destination] || []);
       const discountPct = base ? Math.round((1 - x.price / base) * 100) : null;
       return { ...x, discountPct, baselinePrice: base };
-    }));
+    });
     // Önce en yüksek gerçek indirim, sonra en düşük fiyat
     list.sort((a, b) => (b.discountPct ?? -999) - (a.discountPct ?? -999) || a.price - b.price);
   } else {
@@ -715,8 +716,31 @@ async function deals(q, env) {
 }
 
 // ---------- fiyat hafızası (fırsat avcısı) ----------
+//
+// ÖNEMLİ: Cloudflare'in ücretsiz planı, bir cron çalışmasında yapılabilecek toplam
+// istek sayısını (Travelpayouts + KV okuma/yazma) sınırlıyor. Bu yüzden her rota
+// için ayrı bir KV dosyası tutmak yerine, her ŞEHİR için TEK bir "hafıza paketi"
+// kullanıyoruz: mem:<ORIGIN> = { hist: {DEST: [{d,p},...]}, cooldown: {DEST: "YYYY-MM-DD"} }
+// Böylece bir şehirde 5 rota da olsa 100 rota da olsa, maliyet hep "1 okuma + 1 yazma".
+
+async function readOriginMem(env, origin) {
+  try {
+    const raw = await env.PRICE_HISTORY.get('mem:' + origin);
+    const j = raw ? JSON.parse(raw) : null;
+    return { hist: (j && j.hist) || {}, cooldown: (j && j.cooldown) || {} };
+  } catch (e) {
+    return { hist: {}, cooldown: {} };
+  }
+}
+
+function addDaysISO(dateStr, days) {
+  const p = dateStr.split('-').map(Number);
+  const d = new Date(p[0], p[1] - 1, p[2] + days);
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
 
 // Her gün çalışır: popüler rotaların en ucuz fiyatını bulup KV'ye tarih damgalı kaydeder.
+// Ayrıca gerçekten öne çıkan (normalden %25+ ucuz) rotaları Telegram kanalına gönderir.
 async function runDealScan(env) {
   if (!env.TP_TOKEN || !env.PRICE_HISTORY) return; // ayarlar eksikse sessizce çık
   const today = new Date().toISOString().slice(0, 10);
@@ -728,8 +752,12 @@ async function runDealScan(env) {
   }
 
   const candidates = [];
+  const memByOrigin = {}; // her şehrin hafızası burada RAM'de tutulur, en sona kadar KV'ye yazılmaz
 
   for (const origin of DEAL_ORIGINS) {
+    const mem = await readOriginMem(env, origin); // 1 KV okuma (şehir başına)
+    memByOrigin[origin] = mem;
+
     const bestByDest = {};
     for (const month of months) {
       let r;
@@ -750,14 +778,21 @@ async function runDealScan(env) {
         }
       }
     }
-    // Bulunan her rota için: önce eski hafızayla karşılaştır (fırsat mı?), sonra bugünün fiyatını ekle.
+
+    // Bulunan her rota için: önce hafızayla karşılaştır (fırsat mı?), sonra bugünün
+    // fiyatını hafızaya ekle. Hepsi RAM'de; KV'ye bu şehir bitince tek seferde yazılır.
     for (const [dest, info] of Object.entries(bestByDest)) {
-      const oldHist = await readHistory(env, origin, dest);
+      const oldHist = mem.hist[dest] || [];
       const oldBase = baseline(oldHist);
       const pct = oldBase ? Math.round((1 - info.price / oldBase) * 100) : null;
-      const cooled = await env.PRICE_HISTORY.get('posted:' + origin + ':' + dest);
+      const cooledUntil = mem.cooldown[dest];
+      const cooled = cooledUntil && today < cooledUntil;
       if (!cooled) candidates.push({ origin, dest, price: info.price, link: info.link, date: info.date, pct });
-      await appendHistory(env, origin, dest, today, info.price);
+
+      let h = oldHist.filter(x => x.d !== today);
+      h.push({ d: today, p: info.price });
+      if (h.length > HISTORY_LEN) h = h.slice(h.length - HISTORY_LEN);
+      mem.hist[dest] = h;
     }
   }
 
@@ -785,7 +820,14 @@ async function runDealScan(env) {
     await sendDealAlert(env, a);
     const isReal = a.pct != null && a.pct >= ALERT_THRESHOLD_PCT;
     const ttlDays = isReal ? ALERT_COOLDOWN_DAYS : FILLER_COOLDOWN_DAYS;
-    await env.PRICE_HISTORY.put('posted:' + a.origin + ':' + a.dest, '1', { expirationTtl: ttlDays * 86400 });
+    memByOrigin[a.origin].cooldown[a.dest] = addDaysISO(today, ttlDays);
+  }
+
+  // Her şehir için TEK bir yazma — kaç rota işlendiyse işlensin, maliyet hep aynı.
+  for (const origin of DEAL_ORIGINS) {
+    try {
+      await env.PRICE_HISTORY.put('mem:' + origin, JSON.stringify(memByOrigin[origin]), { expirationTtl: 90 * 86400 });
+    } catch (e) { /* bir şehrin yazımı başarısız olsa bile diğerlerini etkilemesin */ }
   }
 }
 
@@ -810,23 +852,6 @@ async function sendDealAlert(env, a) {
   } catch (e) { /* Telegram'a ulaşılamazsa taramanın geri kalanını bozma */ }
 }
 
-async function readHistory(env, origin, dest) {
-  try {
-    const raw = await env.PRICE_HISTORY.get('hist:' + origin + ':' + dest);
-    return raw ? JSON.parse(raw) : [];
-  } catch (e) {
-    return [];
-  }
-}
-
-async function appendHistory(env, origin, dest, dateStr, price) {
-  const key = 'hist:' + origin + ':' + dest;
-  let hist = await readHistory(env, origin, dest);
-  hist = hist.filter(h => h.d !== dateStr); // aynı gün tekrar çalışırsa üzerine yaz
-  hist.push({ d: dateStr, p: price });
-  if (hist.length > HISTORY_LEN) hist = hist.slice(hist.length - HISTORY_LEN);
-  await env.PRICE_HISTORY.put(key, JSON.stringify(hist), { expirationTtl: 90 * 86400 });
-}
 
 // Geçmiş fiyatların medyanını (tipik fiyat) döndürür; yeterli veri yoksa null.
 function baseline(hist) {
