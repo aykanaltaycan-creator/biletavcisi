@@ -10,13 +10,38 @@
   ];
   // "Nereye" listesinde çıkan yurt dışı şehirler
   var INTL = [
-    ['BCN', 'Barselona'], ['PRG', 'Prag'], ['ROM', 'Roma'], ['MIL', 'Milano'], ['PAR', 'Paris'], ['AMS', 'Amsterdam'],
-    ['BER', 'Berlin'], ['MUC', 'Münih'], ['FRA', 'Frankfurt'], ['VIE', 'Viyana'], ['BUD', 'Budapeşte'], ['ATH', 'Atina'],
-    ['LON', 'Londra'], ['CPH', 'Kopenhag'], ['STO', 'Stockholm'], ['TLL', 'Tallinn'], ['WAW', 'Varşova'],
-    ['BEG', 'Belgrad'], ['SJJ', 'Saraybosna'], ['MAD', 'Madrid'], ['LIS', 'Lizbon'], ['ZRH', 'Zürih'],
-    ['TBS', 'Tiflis'], ['BAK', 'Bakü'], ['DXB', 'Dubai'], ['HRG', 'Hurghada'], ['SSH', 'Şarm El Şeyh'],
-    ['MLE', 'Maldivler'], ['BKK', 'Bangkok'], ['TYO', 'Tokyo'], ['NYC', 'New York'], ['ECN', 'Lefkoşa (Ercan)']
+    ['BCN', 'Barselona', 'Avrupa'], ['PRG', 'Prag', 'Avrupa'], ['ROM', 'Roma', 'Avrupa'], ['MIL', 'Milano', 'Avrupa'],
+    ['PAR', 'Paris', 'Avrupa'], ['AMS', 'Amsterdam', 'Avrupa'], ['BER', 'Berlin', 'Avrupa'], ['MUC', 'Münih', 'Avrupa'],
+    ['FRA', 'Frankfurt', 'Avrupa'], ['VIE', 'Viyana', 'Avrupa'], ['BUD', 'Budapeşte', 'Avrupa'], ['ATH', 'Atina', 'Avrupa'],
+    ['LON', 'Londra', 'Avrupa'], ['CPH', 'Kopenhag', 'Avrupa'], ['STO', 'Stockholm', 'Avrupa'], ['TLL', 'Tallinn', 'Avrupa'],
+    ['WAW', 'Varşova', 'Avrupa'], ['BEG', 'Belgrad', 'Avrupa'], ['SJJ', 'Saraybosna', 'Avrupa'], ['MAD', 'Madrid', 'Avrupa'],
+    ['LIS', 'Lizbon', 'Avrupa'], ['ZRH', 'Zürih', 'Avrupa'], ['DUS', 'Düsseldorf', 'Avrupa'], ['CGN', 'Köln', 'Avrupa'],
+    ['STR', 'Stuttgart', 'Avrupa'], ['HAM', 'Hamburg', 'Avrupa'], ['HAJ', 'Hannover', 'Avrupa'], ['NUE', 'Nürnberg', 'Avrupa'],
+    ['BRU', 'Brüksel', 'Avrupa'], ['GVA', 'Cenevre', 'Avrupa'], ['BSL', 'Basel', 'Avrupa'], ['OPO', 'Porto', 'Avrupa'],
+    ['VCE', 'Venedik', 'Avrupa'], ['NAP', 'Napoli', 'Avrupa'], ['BLQ', 'Bologna', 'Avrupa'], ['SOF', 'Sofya', 'Avrupa'],
+    ['BUH', 'Bükreş', 'Avrupa'], ['KRK', 'Krakov', 'Avrupa'], ['RIX', 'Riga', 'Avrupa'], ['VNO', 'Vilnius', 'Avrupa'],
+    ['HEL', 'Helsinki', 'Avrupa'], ['DUB', 'Dublin', 'Avrupa'], ['EDI', 'Edinburgh', 'Avrupa'], ['MAN', 'Manchester', 'Avrupa'],
+    ['NCE', 'Nis', 'Avrupa'], ['LYS', 'Lyon', 'Avrupa'], ['MRS', 'Marsilya', 'Avrupa'], ['SKG', 'Selanik', 'Avrupa'],
+    ['SKP', 'Üsküp', 'Avrupa'], ['TIA', 'Tiran', 'Avrupa'], ['PRN', 'Priştine', 'Avrupa'], ['KIV', 'Kişinev', 'Avrupa'],
+    ['MLA', 'Malta', 'Avrupa'], ['SPU', 'Split', 'Avrupa'], ['DBV', 'Dubrovnik', 'Avrupa'], ['PMI', 'Mallorca', 'Avrupa'],
+    ['AGP', 'Malaga', 'Avrupa'], ['VLC', 'Valensiya', 'Avrupa'],
+    ['TBS', 'Tiflis', 'Kafkasya'], ['BAK', 'Bakü', 'Kafkasya'], ['EVN', 'Erivan', 'Kafkasya'],
+    ['DXB', 'Dubai', 'Ortadoğu'], ['DOH', 'Doha', 'Ortadoğu'], ['AUH', 'Abu Dabi', 'Ortadoğu'], ['AMM', 'Amman', 'Ortadoğu'],
+    ['BEY', 'Beyrut', 'Ortadoğu'], ['JED', 'Cidde', 'Ortadoğu'], ['RUH', 'Riyad', 'Ortadoğu'], ['KWI', 'Kuveyt', 'Ortadoğu'],
+    ['TLV', 'Tel Aviv', 'Ortadoğu'], ['ECN', 'Lefkoşa (Ercan)', 'Ortadoğu'],
+    ['HRG', 'Hurghada', 'Afrika'], ['SSH', 'Şarm El Şeyh', 'Afrika'], ['CAI', 'Kahire', 'Afrika'], ['TUN', 'Tunus', 'Afrika'],
+    ['CAS', 'Kazablanka', 'Afrika'], ['RAK', 'Marakeş', 'Afrika'], ['ZNZ', 'Zanzibar', 'Afrika'], ['NBO', 'Nairobi', 'Afrika'],
+    ['CPT', 'Cape Town', 'Afrika'], ['JNB', 'Johannesburg', 'Afrika'],
+    ['MLE', 'Maldivler', 'Asya'], ['BKK', 'Bangkok', 'Asya'], ['TYO', 'Tokyo', 'Asya'], ['TAS', 'Taşkent', 'Asya'],
+    ['ALA', 'Almatı', 'Asya'], ['NQZ', 'Astana', 'Asya'], ['SEL', 'Seul', 'Asya'], ['BJS', 'Pekin', 'Asya'],
+    ['SHA', 'Şanghay', 'Asya'], ['HKG', 'Hong Kong', 'Asya'], ['SIN', 'Singapur', 'Asya'], ['KUL', 'Kuala Lumpur', 'Asya'],
+    ['DPS', 'Bali', 'Asya'], ['HKT', 'Phuket', 'Asya'], ['DEL', 'Delhi', 'Asya'], ['BOM', 'Mumbai', 'Asya'],
+    ['CMB', 'Kolombo', 'Asya'],
+    ['NYC', 'New York', 'Amerika'], ['YTO', 'Toronto', 'Amerika'], ['MIA', 'Miami', 'Amerika'], ['CHI', 'Chicago', 'Amerika'],
+    ['LAX', 'Los Angeles', 'Amerika'], ['WAS', 'Washington', 'Amerika'], ['SAO', 'São Paulo', 'Amerika'],
+    ['BUE', 'Buenos Aires', 'Amerika'], ['HAV', 'Havana', 'Amerika'], ['CUN', 'Cancun', 'Amerika'], ['MEX', 'Meksiko', 'Amerika']
   ];
+  var INTL_REGIONS = ['Avrupa', 'Kafkasya', 'Ortadoğu', 'Afrika', 'Asya', 'Amerika'];
   // API'den gelen kodların Türkçe adları (listede olmayanlar kod olarak görünür)
   var NAMES = {
     SAW: 'İstanbul', ADB: 'İzmir', VAN: 'Van', DIY: 'Diyarbakır', ERZ: 'Erzurum', KYA: 'Konya', ASR: 'Kayseri',
@@ -88,11 +113,17 @@
     var sel = $('to'), cur = sel.value || state.to, from = $('from').value;
     sel.innerHTML = '';
     sel.appendChild(opt('ANY', 'Her yer (en ucuzlar)'));
-    var g1 = document.createElement('optgroup'); g1.label = 'Yurt dışı';
-    INTL.slice().sort(function (a, b) { return a[1].localeCompare(b[1], 'tr'); }).forEach(function (x) { g1.appendChild(opt(x[0], x[1])); });
+    INTL_REGIONS.forEach(function (region) {
+      var items = INTL.filter(function (x) { return x[2] === region; })
+        .sort(function (a, b) { return a[1].localeCompare(b[1], 'tr'); });
+      if (!items.length) return;
+      var g = document.createElement('optgroup'); g.label = region;
+      items.forEach(function (x) { g.appendChild(opt(x[0], x[1])); });
+      sel.appendChild(g);
+    });
     var g2 = document.createElement('optgroup'); g2.label = 'Yurt içi';
     TR.forEach(function (x) { if (x.c !== from && !x.intl) g2.appendChild(opt(x.c, x.n)); });
-    sel.appendChild(g1); sel.appendChild(g2);
+    sel.appendChild(g2);
     sel.value = cur === from ? 'ANY' : cur;
     if (!sel.value) sel.value = 'ANY';
   }
