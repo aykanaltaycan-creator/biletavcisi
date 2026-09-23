@@ -850,12 +850,15 @@ async function sendDealAlert(env, a) {
   const priceLine = (a.pct != null && a.pct > 0)
     ? nf(a.price) + ' TL — normalden %' + a.pct + ' ucuz'
     : nf(a.price) + ' TL';
-  // HTML formatı: uzun linkin kendisi yerine kısa, tıklanabilir bir yazı gösterilir.
+  // HTML formatı: Telegram'da uzun linkin kendisi yerine kısa, tıklanabilir bir yazı gösterilir.
+  // Altta düz link de var: WhatsApp'a (veya HTML desteklemeyen bir yere) kopyalayınca
+  // tıklanabilir link kaybolmasın diye — WhatsApp düz linkleri kendiliğinden tıklanabilir yapar.
   const text = '✈️ <b>' + tgEsc(on) + ' – ' + tgEsc(dn) + '</b>\n' +
     tgEsc(priceLine) + '\n' +
     (a.date ? '📅 ' + tgEsc(trDate(a.date.slice(0, 10))) + '\n' : '') +
     '<a href="' + tgEsc(link) + '">✈️ Bileti gör ve satın al</a>' +
-    (a.pct == null ? '\n\n<i>Bu rota için fiyat geçmişi henüz oluşuyor; birkaç gün içinde karşılaştırmalı gösterebileceğiz.</i>' : '');
+    (a.pct == null ? '\n\n<i>Bu rota için fiyat geçmişi henüz oluşuyor; birkaç gün içinde karşılaştırmalı gösterebileceğiz.</i>' : '') +
+    '\n\n<i>Link: ' + tgEsc(link) + '</i>';
   try {
     await fetch('https://api.telegram.org/bot' + env.TG_BOT_TOKEN + '/sendMessage', {
       method: 'POST',
