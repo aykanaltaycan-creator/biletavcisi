@@ -45,6 +45,9 @@
   // böylece herhangi bir şehirden herhangi bir şehre arama yapılabiliyor.
   var ALL_REGIONS = ['Yurt içi'].concat(INTL_REGIONS);
   var ALL_CITIES = TR.map(function (x) { return [x.c, x.n + (x.s ? ' (' + x.s + ')' : ''), 'Yurt içi']; }).concat(INTL);
+  // Fırsatlar bölümünde yurt içi/yurt dışı ayrımı için: sitenin bildiği tüm
+  // uluslararası kodlar. Bunda olmayan bir kod, büyük ihtimalle bir Türkiye havalimanıdır.
+  var INTL_CODE_SET = new Set(INTL.map(function (x) { return x[0]; }));
   // API'den gelen kodların Türkçe adları (listede olmayanlar kod olarak görünür)
   var NAMES = {
     SAW: 'İstanbul', ADB: 'İzmir', VAN: 'Van', DIY: 'Diyarbakır', ERZ: 'Erzurum', KYA: 'Konya', ASR: 'Kayseri',
@@ -192,6 +195,28 @@
     });
   }
 
+  // ---------- yurt dışı / yurt içi sekmeleri (ortak) ----------
+  function regionTabsHTML(idPrefix, intlHtml, domesticHtml) {
+    return '<div class="chips" role="group" aria-label="Bölge">' +
+      '<button type="button" class="chip region-chip" data-target="' + idPrefix + 'Intl" aria-pressed="true">✈️ Yurt Dışı</button>' +
+      '<button type="button" class="chip region-chip" data-target="' + idPrefix + 'Domestic" aria-pressed="false">🛫 Yurt İçi</button>' +
+      '</div>' +
+      '<div id="' + idPrefix + 'Intl">' + intlHtml + '</div>' +
+      '<div id="' + idPrefix + 'Domestic" style="display:none">' + domesticHtml + '</div>';
+  }
+  function wireRegionTabs(scopeEl) {
+    var chips = scopeEl.querySelectorAll('.region-chip');
+    chips.forEach(function (b) {
+      b.addEventListener('click', function () {
+        chips.forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); });
+        chips.forEach(function (x) {
+          var t = document.getElementById(x.dataset.target);
+          if (t) t.style.display = (x === b) ? '' : 'none';
+        });
+      });
+    });
+  }
+
   function renderAnywhere(r) {
     var t = iso(today());
     var intl = (r.intl || []).filter(function (x) { return x.date >= t; });
@@ -202,6 +227,7 @@
       return;
     }
     function board(list) {
+      if (!list.length) return '<div class="state">Bu kategoride kayıtlı fiyat yok.</div>';
       var b = '<ul class="board">';
       list.forEach(function (x) {
         var dep = parse(x.date), ret = x.ret ? parse(x.ret) : null;
@@ -212,10 +238,10 @@
       });
       return b + '</ul>';
     }
-    if (intl.length) h += '<h3 class="sublist-title">✈️ Yurt dışı</h3>' + board(intl);
-    if (domestic.length) h += '<h3 class="sublist-title">🛫 Yurt içi</h3>' + board(domestic);
+    h += regionTabsHTML('any', board(intl), board(domestic));
     h += '<p class="src">Bir satıra tıklayınca bileti satan sitede o uçuş açılır.</p>';
     $('sonuc').innerHTML = h;
+    wireRegionTabs($('sonuc'));
   }
 
   function renderCalendar(r) {
@@ -292,18 +318,25 @@
   }
   function renderDeals(r) {
     var t = iso(today());
-    var list = (r.list || []).filter(function (x) { return x.date >= t; }).slice(0, 12);
-    if (!list.length) { $('deals').innerHTML = '<div class="state">Bu şehirden şu an fırsat bilet görünmüyor. Başka bir kalkış şehri seç.</div>'; return; }
-    var h = '<ul class="board">';
-    list.forEach(function (x) {
-      var dep = parse(x.date), ret = x.ret ? parse(x.ret) : null;
-      h += '<li><a class="row" href="' + esc(x.link) + '" target="_blank" rel="noopener">' +
-        '<span class="route">' + esc(name(x.origin)) + ' – ' + esc(NAMES[x.destination] || x.destName || x.destination) +
-        '<small>' + esc(x.airlineTitle || AIRLINES[x.airline] || x.airline || '') + (ret ? ', gidiş-dönüş' : ', tek yön') + '</small></span>' +
-        '<span class="when">' + short(dep) + (ret ? ' – ' + short(ret) : '') + '</span>' +
-        '<span class="save">' + (x.discountPct != null && x.discountPct > 0 ? 'normalden %' + x.discountPct + ' ucuz' : 'fırsat') + '</span><span class="amt">' + tl(x.price) + '</span></a></li>';
-    });
-    $('deals').innerHTML = h + '</ul>';
+    var list = (r.list || []).filter(function (x) { return x.date >= t; });
+    var intl = list.filter(function (x) { return INTL_CODE_SET.has(x.destination); }).slice(0, 12);
+    var domestic = list.filter(function (x) { return !INTL_CODE_SET.has(x.destination); }).slice(0, 12);
+    if (!intl.length && !domestic.length) { $('deals').innerHTML = '<div class="state">Bu şehirden şu an fırsat bilet görünmüyor. Başka bir kalkış şehri seç.</div>'; return; }
+    function board(list) {
+      if (!list.length) return '<div class="state">Bu kategoride şu an fırsat bilet görünmüyor.</div>';
+      var h = '<ul class="board">';
+      list.forEach(function (x) {
+        var dep = parse(x.date), ret = x.ret ? parse(x.ret) : null;
+        h += '<li><a class="row" href="' + esc(x.link) + '" target="_blank" rel="noopener">' +
+          '<span class="route">' + esc(name(x.origin)) + ' – ' + esc(NAMES[x.destination] || x.destName || x.destination) +
+          '<small>' + esc(x.airlineTitle || AIRLINES[x.airline] || x.airline || '') + (ret ? ', gidiş-dönüş' : ', tek yön') + '</small></span>' +
+          '<span class="when">' + short(dep) + (ret ? ' – ' + short(ret) : '') + '</span>' +
+          '<span class="save">' + (x.discountPct != null && x.discountPct > 0 ? 'normalden %' + x.discountPct + ' ucuz' : 'fırsat') + '</span><span class="amt">' + tl(x.price) + '</span></a></li>';
+      });
+      return h + '</ul>';
+    }
+    $('deals').innerHTML = regionTabsHTML('deals', board(intl), board(domestic));
+    wireRegionTabs($('deals'));
   }
   (function chips() {
     var c = $('dealChips');
@@ -457,6 +490,58 @@
       h += '<li><a class="row" href="/rehber/' + g[0] + '"><span class="route">' + esc(g[1]) + '</span></a></li>';
     });
     $('guideLinks').innerHTML = h;
+  })();
+
+  // ---------- kesin tarihlerle ara ----------
+  (function () {
+    var today0 = today();
+    $('exDepart').value = iso(addDays(today0, 45));
+    $('exReturn').value = iso(addDays(today0, 52));
+    document.querySelectorAll('.seg button').forEach(function (b) {
+      b.addEventListener('click', function () {
+        $('exReturnWrap').style.display = (b.dataset.trip === 'rt') ? '' : 'none';
+      });
+    });
+
+    function renderExact(r) {
+      if (r.exact) {
+        var x = r.exact, dep = parse(x.date), ret = x.ret ? parse(x.ret) : null;
+        var h = '<div class="detail"><h3>' + esc(name(r.origin)) + ' – ' + esc(name(r.destination)) + '</h3>';
+        h += '<div class="price">' + tl(x.price) + '</div><div class="when">kişi başı, tam bu tarihler için</div>';
+        h += '<dl><dt>Gidiş</dt><dd>' + fmt(dep) + '</dd>';
+        if (ret) h += '<dt>Dönüş</dt><dd>' + fmt(ret) + '</dd>';
+        h += '<dt>Havayolu</dt><dd>' + airlineHTML(x.airline) + '</dd></dl>';
+        h += '<a class="btn" href="' + esc(x.link) + '" target="_blank" rel="noopener">Bileti satın alma sayfasında aç</a></div>';
+        $('exactResult').innerHTML = h;
+      } else if (r.near && r.near.length) {
+        var h2 = '<div class="state">Tam bu tarihler için kayıtlı fiyat yok. En yakın bulduklarımız:</div><ul class="board">';
+        r.near.forEach(function (x) {
+          var d = parse(x.date), rt2 = x.ret ? parse(x.ret) : null;
+          h2 += '<li><a class="row" href="' + esc(x.link) + '" target="_blank" rel="noopener">' +
+            '<span class="route">' + short(d) + (rt2 ? ' – ' + short(rt2) : '') + '</span>' +
+            '<span></span><span></span><span class="amt">' + tl(x.price) + '</span></a></li>';
+        });
+        $('exactResult').innerHTML = h2 + '</ul>';
+      } else {
+        $('exactResult').innerHTML = '<div class="state">Bu rota ve tarih için hiç veri yok. Yukarıdaki ay takviminden bakmayı dene.</div>';
+      }
+    }
+
+    $('exactBtn').addEventListener('click', function () {
+      if ($('to').value === 'ANY') {
+        $('exactResult').innerHTML = '<div class="state err">Kesin tarih araması için "Nereye" kısmında belirli bir şehir seçmen gerekiyor.</div>';
+        return;
+      }
+      var depart = $('exDepart').value;
+      if (!depart) return;
+      var rtOn = document.querySelector('.seg button[data-trip="rt"]').getAttribute('aria-pressed') === 'true';
+      var ret = rtOn ? $('exReturn').value : '';
+      $('exactResult').innerHTML = '<div class="state">Aranıyor…</div>';
+      var q = 'origin=' + $('from').value + '&destination=' + $('to').value + '&depart=' + depart + (ret ? '&return=' + ret : '');
+      api('/api/exact?' + q).then(renderExact).catch(function (err) {
+        $('exactResult').innerHTML = '<div class="state err">' + esc(err.message) + '</div>';
+      });
+    });
   })();
 
   // ---------- başlangıç ----------
