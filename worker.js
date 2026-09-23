@@ -18,6 +18,10 @@ const AFF = {
 // Fiyat hafızası taranacak kalkış şehirleri ve kaç ay ileriye bakılacağı.
 const DEAL_ORIGINS = ['IST', 'ESB', 'IZM', 'AYT'];
 const DEAL_MONTHS_AHEAD = 1; // bu ay + gelecek ay (istek sayısını düşük tutmak için)
+// Telegram kanalına sadece yurt dışı rotalar önerilir — yurt içi kısa uçuşlar
+// (Ankara-Antalya gibi) fiyatı düşük olduğu için "dolgu" mesajlarını hep ele geçiriyordu.
+// Kıbrıs (ECN) da kısa/sık uçulan bir hat olduğu için aynı sebeple dışarıda tutuluyor.
+const TR_DOMESTIC = new Set(['IST', 'ESB', 'IZM', 'AYT', 'ADA', 'TZX', 'GZT', 'DLM', 'BJV', 'ECN']);
 const HISTORY_LEN = 45;      // her rota için saklanan gün sayısı
 const MIN_HISTORY_FOR_DEAL = 5; // karşılaştırma yapılabilmesi için gereken en az gün sayısı
 const ALERT_THRESHOLD_PCT = 25; // Telegram'a "fırsat" olarak düşecek minimum indirim yüzdesi
@@ -795,7 +799,7 @@ async function runDealScan(env) {
       const pct = oldBase ? Math.round((1 - info.price / oldBase) * 100) : null;
       const cooledUntil = mem.cooldown[dest];
       const cooled = cooledUntil && today < cooledUntil;
-      if (!cooled) candidates.push({ origin, dest, price: info.price, link: info.link, date: info.date, pct });
+      if (!cooled && !TR_DOMESTIC.has(dest)) candidates.push({ origin, dest, price: info.price, link: info.link, date: info.date, pct });
 
       let h = oldHist.filter(x => x.d !== today);
       h.push({ d: today, p: info.price });
