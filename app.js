@@ -498,6 +498,13 @@
     $('exDepart').value = iso(addDays(today0, 45));
     $('exReturn').value = iso(addDays(today0, 52));
 
+    $('exactToggle').addEventListener('click', function () {
+      var open = $('exactRow').hidden;
+      $('exactRow').hidden = !open;
+      $('exactToggle').textContent = open ? 'kesin tarihi gizle ▴' : 'veya kesin tarih seç ▾';
+      if (open) $('exDepart').focus();
+    });
+
     // Buton yazısı, dönüş tarihi girilip girilmediğine göre kendiliğinden değişir.
     function updateExactBtnLabel() {
       $('exactBtn').textContent = $('exReturn').value ? 'Ara' : 'Tek yön ara';
