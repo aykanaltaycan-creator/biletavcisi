@@ -22,6 +22,9 @@ const DEAL_MONTHS_AHEAD = 1; // bu ay + gelecek ay (istek sayısını düşük t
 // (Ankara-Antalya gibi) fiyatı düşük olduğu için "dolgu" mesajlarını hep ele geçiriyordu.
 // Kıbrıs (ECN) da kısa/sık uçulan bir hat olduğu için aynı sebeple dışarıda tutuluyor.
 const TR_DOMESTIC = new Set(['IST', 'ESB', 'IZM', 'AYT', 'ADA', 'TZX', 'GZT', 'DLM', 'BJV', 'ECN']);
+// Sitedeki "Her yer" sonuçlarını Yurt İçi / Yurt Dışı diye ayırmak için gerçek
+// Türkiye havalimanı listesi (Kıbrıs burada yurt dışı sayılıyor, Telegram listesinden farklı).
+const TR_AIRPORTS = new Set(['IST', 'ESB', 'IZM', 'AYT', 'ADA', 'TZX', 'GZT', 'DLM', 'BJV']);
 const HISTORY_LEN = 45;      // her rota için saklanan gün sayısı
 const MIN_HISTORY_FOR_DEAL = 5; // karşılaştırma yapılabilmesi için gereken en az gün sayısı
 const ALERT_THRESHOLD_PCT = 25; // Telegram'a "fırsat" olarak düşecek minimum indirim yüzdesi
@@ -694,8 +697,10 @@ async function anywhere(q, env) {
     if (rt && !t.ret) continue;
     if (!best[t.destination] || t.price < best[t.destination].price) best[t.destination] = t;
   }
-  const list = Object.values(best).sort((a, b) => a.price - b.price).slice(0, 30);
-  return { origin: o, month, rt, list };
+  const all = Object.values(best).sort((a, b) => a.price - b.price);
+  const intl = all.filter(t => !TR_AIRPORTS.has(t.destination)).slice(0, 30);
+  const domestic = all.filter(t => TR_AIRPORTS.has(t.destination)).slice(0, 30);
+  return { origin: o, month, rt, intl, domestic };
 }
 
 async function deals(q, env) {
