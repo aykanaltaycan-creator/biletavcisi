@@ -22,9 +22,11 @@ const DEAL_MONTHS_AHEAD = 1; // bu ay + gelecek ay (istek sayısını düşük t
 // (Ankara-Antalya gibi) fiyatı düşük olduğu için "dolgu" mesajlarını hep ele geçiriyordu.
 // Kıbrıs (ECN) da kısa/sık uçulan bir hat olduğu için aynı sebeple dışarıda tutuluyor.
 const TR_DOMESTIC = new Set(['IST', 'ESB', 'IZM', 'AYT', 'ADA', 'TZX', 'GZT', 'DLM', 'BJV', 'ECN']);
-// Sitedeki "Her yer" sonuçlarını Yurt İçi / Yurt Dışı diye ayırmak için gerçek
-// Türkiye havalimanı listesi (Kıbrıs burada yurt dışı sayılıyor, Telegram listesinden farklı).
-const TR_AIRPORTS = new Set(['IST', 'ESB', 'IZM', 'AYT', 'ADA', 'TZX', 'GZT', 'DLM', 'BJV']);
+// Sitedeki "Her yer" sonuçlarını Yurt İçi / Yurt Dışı diye ayırmak için sitenin
+// kendi uluslararası şehir listesini kullanıyoruz: bu listede olmayan bir kod,
+// büyük ihtimalle küçük bir Türkiye havalimanıdır (57 havalimanının hepsini tek
+// tek ezberlemek yerine, "bilinen yurt dışı listesinde yok" mantığı daha sağlam).
+const INTL_CODES = new Set(['BCN', 'PRG', 'ROM', 'MIL', 'PAR', 'AMS', 'BER', 'MUC', 'FRA', 'VIE', 'BUD', 'ATH', 'LON', 'CPH', 'STO', 'TLL', 'WAW', 'BEG', 'SJJ', 'MAD', 'LIS', 'ZRH', 'DUS', 'CGN', 'STR', 'HAM', 'HAJ', 'NUE', 'BRU', 'GVA', 'BSL', 'OPO', 'VCE', 'NAP', 'BLQ', 'SOF', 'BUH', 'KRK', 'RIX', 'VNO', 'HEL', 'DUB', 'EDI', 'MAN', 'NCE', 'LYS', 'MRS', 'SKG', 'SKP', 'TIA', 'PRN', 'KIV', 'MLA', 'SPU', 'DBV', 'PMI', 'AGP', 'VLC', 'OSL', 'TBS', 'BAK', 'EVN', 'DXB', 'DOH', 'AUH', 'AMM', 'BEY', 'JED', 'RUH', 'KWI', 'TLV', 'ECN', 'HRG', 'SSH', 'CAI', 'TUN', 'CAS', 'RAK', 'ZNZ', 'NBO', 'CPT', 'JNB', 'MLE', 'BKK', 'TYO', 'TAS', 'ALA', 'NQZ', 'SEL', 'BJS', 'SHA', 'HKG', 'SIN', 'KUL', 'DPS', 'HKT', 'DEL', 'BOM', 'CMB', 'NYC', 'YTO', 'MIA', 'CHI', 'LAX', 'WAS', 'SAO', 'BUE', 'HAV', 'CUN', 'MEX']);
 const HISTORY_LEN = 45;      // her rota için saklanan gün sayısı
 const MIN_HISTORY_FOR_DEAL = 5; // karşılaştırma yapılabilmesi için gereken en az gün sayısı
 const ALERT_THRESHOLD_PCT = 25; // Telegram'a "fırsat" olarak düşecek minimum indirim yüzdesi
@@ -634,6 +636,7 @@ async function handleApi(request, env, ctx, ep) {
     const q = url.searchParams;
     if (ep === 'calendar') body = await calendar(q, env);
     else if (ep === 'anywhere') body = await anywhere(q, env);
+    else if (ep === 'exact') body = await exact(q, env);
     else if (ep === 'deals') { body = await deals(q, env); ttl = 21600; }
     else return json({ error: 'Bilinmeyen istek.' }, 404);
   } catch (e) {
@@ -681,6 +684,43 @@ async function calendar(q, env) {
   return { origin: o, destination: d, month, rt, stay, days };
 }
 
+const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+
+// "Kesin tarih" araması: kullanıcı ayı gezmek yerine tam olarak hangi gün gidip
+// hangi gün döneceğini biliyorsa, doğrudan o iki tarih için fiyat arar.
+// Tam o günde veri yoksa (önbellekte o gün için kimse aramamış olabilir),
+// ±3 gün içindeki en yakın seçenekleri önerir.
+async function exact(q, env) {
+  const o = code(q.get('origin')), d = code(q.get('destination'));
+  const depart = q.get('depart');
+  const ret = q.get('return') || null;
+  if (!DATE_RE.test(depart || '')) throw bad('Gidiş tarihi hatalı.');
+  if (ret && !DATE_RE.test(ret)) throw bad('Dönüş tarihi hatalı.');
+
+  const month = depart.slice(0, 7);
+  const p = { origin: o, destination: d, departure_at: month, group_by: 'departure_at', currency: 'try' };
+  let nights = null;
+  if (ret) {
+    nights = Math.round((new Date(ret) - new Date(depart)) / 86400000);
+    if (nights < 1) throw bad('Dönüş tarihi gidişten sonra olmalı.');
+    p.min_trip_duration = Math.max(1, nights - 1);
+    p.max_trip_duration = nights + 1;
+  }
+
+  const r = await tp('/aviasales/v3/grouped_prices', p, env);
+  let days = Object.values(r.data || {}).map(t => norm(t, env));
+  if (ret) days = days.filter(t => t.ret);
+
+  const exactMatch = days.find(t => t.date === depart) || null;
+  const near = days.filter(t => t.date !== depart)
+    .map(t => ({ ...t, diff: Math.abs((new Date(t.date) - new Date(depart)) / 86400000) }))
+    .filter(t => t.diff <= 3)
+    .sort((a, b) => a.price - b.price || a.diff - b.diff)
+    .slice(0, 5);
+
+  return { origin: o, destination: d, depart, return: ret, nights, exact: exactMatch, near };
+}
+
 async function anywhere(q, env) {
   const o = code(q.get('origin'));
   const month = q.get('month');
@@ -698,8 +738,8 @@ async function anywhere(q, env) {
     if (!best[t.destination] || t.price < best[t.destination].price) best[t.destination] = t;
   }
   const all = Object.values(best).sort((a, b) => a.price - b.price);
-  const intl = all.filter(t => !TR_AIRPORTS.has(t.destination)).slice(0, 30);
-  const domestic = all.filter(t => TR_AIRPORTS.has(t.destination)).slice(0, 30);
+  const intl = all.filter(t => INTL_CODES.has(t.destination)).slice(0, 30);
+  const domestic = all.filter(t => !INTL_CODES.has(t.destination)).slice(0, 30);
   return { origin: o, month, rt, intl, domestic };
 }
 
