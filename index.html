@@ -71,24 +71,22 @@
             <option value="14">14 gece</option>
           </select>
         </label>
+        <button type="button" id="exactToggle" class="sign-link">veya kesin tarih seç ▾</button>
       </div>
-    </form>
-
-    <details class="exact-search">
-      <summary>Kesin tarihlerle ara (örn. "21 Aralık'tan 1 Ocak'a")</summary>
-      <div class="exact-grid">
+      <div class="sign-row3" id="exactRow" hidden>
         <div class="field">
           <label for="exDepart">Gidiş tarihi</label>
           <input type="date" id="exDepart">
         </div>
         <div class="field" id="exReturnWrap">
-          <label for="exReturn">Dönüş tarihi <span class="hint">(boş bırak, tek yön arasın)</span></label>
+          <label for="exReturn">Dönüş tarihi <span class="hint">(boş kalsın, tek yön arasın)</span></label>
           <input type="date" id="exReturn">
         </div>
-        <button type="button" id="exactBtn" class="btn">Ara</button>
+        <button type="button" id="exactBtn" class="go go-sm">Ara</button>
       </div>
-      <div id="exactResult"></div>
-    </details>
+    </form>
+
+    <div id="exactResult"></div>
   </section>
 
   <section id="sonuc" aria-live="polite"></section>
