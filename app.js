@@ -194,21 +194,27 @@
 
   function renderAnywhere(r) {
     var t = iso(today());
-    var list = (r.list || []).filter(function (x) { return x.date >= t; });
+    var intl = (r.intl || []).filter(function (x) { return x.date >= t; });
+    var domestic = (r.domestic || []).filter(function (x) { return x.date >= t; });
     var h = '<div class="result-head"><h2>' + esc(name(state.from)) + ' çıkışlı en ucuz yerler, ' + monthTitle() + '</h2><span class="best">' + (state.rt ? 'gidiş-dönüş' : 'tek yön') + '</span></div>';
-    if (!list.length) {
+    if (!intl.length && !domestic.length) {
       $('sonuc').innerHTML = h + '<div class="state">Bu ay için kayıtlı fiyat yok. Başka bir ay ya da kalkış şehri dene.</div>';
       return;
     }
-    h += '<ul class="board">';
-    list.forEach(function (x) {
-      var dep = parse(x.date), ret = x.ret ? parse(x.ret) : null;
-      h += '<li><a class="row" href="' + esc(x.link) + '" target="_blank" rel="noopener">' +
-        '<span class="route">' + esc(name(x.destination)) + '<small>' + esc(AIRLINES[x.airline] || x.airline || '') + ', ' + stopsText(x.transfers) + '</small></span>' +
-        '<span class="when">' + short(dep) + (ret ? ' – ' + short(ret) : '') + '</span>' +
-        '<span></span><span class="amt">' + tl(x.price) + '</span></a></li>';
-    });
-    h += '</ul><p class="src">Bir satıra tıklayınca bileti satan sitede o uçuş açılır.</p>';
+    function board(list) {
+      var b = '<ul class="board">';
+      list.forEach(function (x) {
+        var dep = parse(x.date), ret = x.ret ? parse(x.ret) : null;
+        b += '<li><a class="row" href="' + esc(x.link) + '" target="_blank" rel="noopener">' +
+          '<span class="route">' + esc(name(x.destination)) + '<small>' + esc(AIRLINES[x.airline] || x.airline || '') + ', ' + stopsText(x.transfers) + '</small></span>' +
+          '<span class="when">' + short(dep) + (ret ? ' – ' + short(ret) : '') + '</span>' +
+          '<span></span><span class="amt">' + tl(x.price) + '</span></a></li>';
+      });
+      return b + '</ul>';
+    }
+    if (intl.length) h += '<h3 class="sublist-title">✈️ Yurt dışı</h3>' + board(intl);
+    if (domestic.length) h += '<h3 class="sublist-title">🛫 Yurt içi</h3>' + board(domestic);
+    h += '<p class="src">Bir satıra tıklayınca bileti satan sitede o uçuş açılır.</p>';
     $('sonuc').innerHTML = h;
   }
 
