@@ -54,6 +54,19 @@ a{color:var(--blue)}
 .swap-btn:hover:not(:disabled){background:#000;color:var(--sign)}
 .swap-btn:disabled{opacity:.35;cursor:not-allowed}
 .swap-btn:focus-visible{outline-color:#000;outline-offset:2px}
+
+/* kesin tarih arama */
+.exact-search{margin-top:14px}
+.exact-search summary{cursor:pointer;font-weight:600;color:var(--muted);padding:4px 0;list-style:none}
+.exact-search summary::-webkit-details-marker{display:none}
+.exact-search summary:before{content:"▸ ";display:inline-block}
+.exact-search[open] summary:before{content:"▾ "}
+.exact-grid{display:flex;flex-wrap:wrap;gap:14px;align-items:end;margin-top:12px;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-l);padding:16px}
+.exact-grid .field{flex:1;min-width:150px}
+.exact-grid .field label{font-family:var(--display);font-weight:600;font-size:16px;display:block;margin-bottom:4px}
+.exact-grid input[type="date"]{width:100%;font:inherit;padding:10px 12px;border:1px solid var(--line);border-radius:var(--radius-s);background:var(--bg);color:var(--ink)}
+#exactResult{margin-top:14px}
+.exact-grid .hint{font-family:var(--body);font-weight:400;font-size:13px;color:var(--muted)}
 .field label,.legend-title{display:block;font-family:var(--display);font-weight:700;font-size:22px;margin-bottom:6px;line-height:1}
 .field select,.field input{width:100%;font:inherit;font-size:17px;padding:11px 12px;border:2px solid #000;border-radius:var(--radius-s);background:#fff;color:#000;appearance:auto}
 .sign-row2{display:flex;flex-wrap:wrap;gap:18px;align-items:center;margin-top:16px}
