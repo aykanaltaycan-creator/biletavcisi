@@ -497,11 +497,14 @@
     var today0 = today();
     $('exDepart').value = iso(addDays(today0, 45));
     $('exReturn').value = iso(addDays(today0, 52));
-    document.querySelectorAll('.seg button').forEach(function (b) {
-      b.addEventListener('click', function () {
-        $('exReturnWrap').style.display = (b.dataset.trip === 'rt') ? '' : 'none';
-      });
-    });
+
+    // Buton yazısı, dönüş tarihi girilip girilmediğine göre kendiliğinden değişir.
+    function updateExactBtnLabel() {
+      $('exactBtn').textContent = $('exReturn').value ? 'Ara' : 'Tek yön ara';
+    }
+    $('exReturn').addEventListener('change', updateExactBtnLabel);
+    $('exReturn').addEventListener('input', updateExactBtnLabel);
+    updateExactBtnLabel();
 
     function renderExact(r) {
       if (r.exact) {
@@ -534,8 +537,7 @@
       }
       var depart = $('exDepart').value;
       if (!depart) return;
-      var rtOn = document.querySelector('.seg button[data-trip="rt"]').getAttribute('aria-pressed') === 'true';
-      var ret = rtOn ? $('exReturn').value : '';
+      var ret = $('exReturn').value; // boşsa tek yön aranır
       $('exactResult').innerHTML = '<div class="state">Aranıyor…</div>';
       var q = 'origin=' + $('from').value + '&destination=' + $('to').value + '&depart=' + depart + (ret ? '&return=' + ret : '');
       api('/api/exact?' + q).then(renderExact).catch(function (err) {
